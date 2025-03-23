@@ -104,11 +104,11 @@ To evaluate all metrics at once, use the evaluation script:
 ```
 This will run the following evaluations:
 
-Accuracy evaluation using a binary classifier
+**Accuracy** evaluation using a binary classifier
 
-FID score evaluation for visual quality
+**FID** score evaluation for visual quality
 
-LPIPS score evaluation for diversity
+**LPIPS** score evaluation for diversity
 
 To view summarized results:
 
@@ -121,24 +121,24 @@ Results will be available at result/YOUR_EXPERIMENT_NAME/*_resall.txt.
 ## ✨ Key Innovations
 Semantic-First Approach: We determine optimal placement using only the foreground object's category without requiring the actual foreground image, significantly reducing computational complexity.
 
-Transfer Learning: We leverage pre-trained scene graph extraction models that incorporate cross-domain knowledge of common object relationships and spatial arrangements.
+**Transfer Learning**: We leverage pre-trained scene graph extraction models that incorporate cross-domain knowledge of common object relationships and spatial arrangements.
 
-Edge-Aware Graph Neural Networks: Our model processes scene semantics through structured relationships, preserving and enhancing semantic connections.
+**Edge-Aware Graph Neural Networks**: Our model processes scene semantics through structured relationships, preserving and enhancing semantic connections.
 
-Cross-Modal Attention: We align categorical embeddings with enhanced scene features through a dedicated attention mechanism.
+**Cross-Modal Attention**: We align categorical embeddings with enhanced scene features through a dedicated attention mechanism.
 
-Multi-Objective Training: Our approach incorporates semantic consistency constraints alongside adversarial learning.
+**Multi-Objective Training**: Our approach incorporates semantic consistency constraints alongside adversarial learning.
 
 ## 📑 Model Architecture
 GraPLUS consists of four principal components:
 
-Scene Graph Processing: Transforms background images into structured graph representations.
+**Scene Graph Processing**: Transforms background images into structured graph representations.
 
-Semantic Enhancement: Maps nodes and edges to rich embeddings and augments them with spatial information.
+**Semantic Enhancement**: Maps nodes and edges to rich embeddings and augments them with spatial information.
 
-Graph Transformer Network: Processes object-object interactions through edge-aware attention.
+**Graph Transformer Network**: Processes object-object interactions through edge-aware attention.
 
-Cross-Attention Module: Computes attention weights between foreground object category and scene features.
+**Cross-Attention Module**: Computes attention weights between foreground object category and scene features.
 
 This semantic-first design enables contextually appropriate object placements with improved coherence and accuracy compared to pixel-based methods.
 
@@ -153,10 +153,6 @@ If you find GraPLUS useful, please cite our paper:
   year={2025}
 }
 ```
-## 🔗 Other Resources
-Awesome-Object-Placement
-
-Awesome-Image-Composition
 
 ## 🙏 Acknowledgements
 Some of the evaluation codes in this repo are borrowed and modified from Faster-RCNN-VG, OPA, FID-Pytorch, GracoNet, and Perceptual Similarity. Thanks to the authors for their great work.
