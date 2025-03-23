@@ -155,7 +155,7 @@ If you find GraPLUS useful, please cite our paper:
 ```
 
 ## 🙏 Acknowledgements
-Some of the evaluation codes in this repo are borrowed and modified from Faster-RCNN-VG, OPA, FID-Pytorch, GracoNet, and Perceptual Similarity. Thanks to the authors for their great work.
+Some of the evaluation codes in this repo are borrowed and modified from [Faster-RCNN-VG](https://github.com/shilrley6/Faster-R-CNN-with-model-pretrained-on-Visual-Genome), [OPA](https://github.com/bcmi/Object-Placement-Assessment-Dataset-OPA), [FID-Pytorch](https://github.com/mseitzer/pytorch-fid),[Perceptual Similarity](https://github.com/richzhang/PerceptualSimilarity), [GracoNet]([https://github.com/richzhang/PerceptualSimilarity](https://github.com/bcmi/GracoNet-Object-Placement)) and [CSANet]([https://github.com/richzhang/PerceptualSimilarity](https://github.com/CodeGoat24/CSANet)) . Thanks to the authors for their great work.
 
 ## 📧 Contact
 If you have any technical questions or suggestions, please open a new issue or feel free to contact:
