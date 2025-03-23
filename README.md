@@ -38,6 +38,7 @@ conda install pytorch==1.9.1 torchvision==0.10.1 torchaudio==0.9.1 cudatoolkit=1
 
 
 ## 🌓 Data Preparation
+### OPA Dataset 
 Download and extract [OPA](https://github.com/bcmi/Object-Placement-Assessment-Dataset-OPA) dataset from the official link: [google drive](https://drive.google.com/file/d/133Wic_nSqfrIajDnnxwvGzjVti-7Y6PF/view?usp=sharing) or [baidu disk](https://pan.baidu.com/s/1IzVLcXWLFgFR4GAbxZUPkw) (code: a982). We expect the directory structure to be the following:
 ```
 <PATH_TO_OPA>
@@ -62,6 +63,9 @@ You will see some new files and directories:
   test_data_pos.csv            # test annotation for positive samples
   test_data_pos_unique.csv     # test annotation for positive samples with different fg/bg pairs 
 ```
+
+### OPA Scene Graph Dataset 
+
 
 ## 💻 Training
 To train GraPLUS, use the provided training script:
