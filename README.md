@@ -143,7 +143,7 @@ GraPLUS consists of four principal components:
 This semantic-first design enables contextually appropriate object placements with improved coherence and accuracy compared to pixel-based methods.
 
 ## 🖊️ Citation
-If you find GraPLUS useful, please cite our paper:
+If you find **GraPLUS** useful, please cite our paper:
 
 ```
 @article{khaleghi2025graplus,
@@ -155,12 +155,12 @@ If you find GraPLUS useful, please cite our paper:
 ```
 
 ## 🙏 Acknowledgements
-Some of the evaluation codes in this repo are borrowed and modified from [Faster-RCNN-VG](https://github.com/shilrley6/Faster-R-CNN-with-model-pretrained-on-Visual-Genome), [OPA](https://github.com/bcmi/Object-Placement-Assessment-Dataset-OPA), [FID-Pytorch](https://github.com/mseitzer/pytorch-fid),[Perceptual Similarity](https://github.com/richzhang/PerceptualSimilarity), [GracoNet]([https://github.com/richzhang/PerceptualSimilarity](https://github.com/bcmi/GracoNet-Object-Placement)) and [CSANet]([https://github.com/richzhang/PerceptualSimilarity](https://github.com/CodeGoat24/CSANet)) . Thanks to the authors for their great work.
+Some of the evaluation codes in this repo are borrowed and modified from [Faster-RCNN-VG](https://github.com/shilrley6/Faster-R-CNN-with-model-pretrained-on-Visual-Genome), [OPA](https://github.com/bcmi/Object-Placement-Assessment-Dataset-OPA),  [FID-Pytorch](https://github.com/mseitzer/pytorch-fid), [Perceptual Similarity](https://github.com/richzhang/PerceptualSimilarity), [GracoNet](https://github.com/bcmi/GracoNet-Object-Placement) and [CSANet](https://github.com/CodeGoat24/CSANet).
 
 ## 📧 Contact
 If you have any technical questions or suggestions, please open a new issue or feel free to contact:
 
-Mir Mohammad Khaleghi (m.khaleghi@ec.iut.ac.ir)
+Mir Mohammad Khaleghi (m.khaleghi@ec.iut.ac.ir) (mamadkhaleghi1994@gmail.com)
 
 Mehran Safayani (safayani@iut.ac.ir) - Corresponding author
 
