@@ -37,7 +37,7 @@ conda install pytorch==1.9.1 torchvision==0.10.1 torchaudio==0.9.1 cudatoolkit=1
 
 
 
-##🌓 Data Preparation
+## 🌓 Data Preparation
 Download and extract [OPA](https://github.com/bcmi/Object-Placement-Assessment-Dataset-OPA) dataset from the official link: [google drive](https://drive.google.com/file/d/133Wic_nSqfrIajDnnxwvGzjVti-7Y6PF/view?usp=sharing) or [baidu disk](https://pan.baidu.com/s/1IzVLcXWLFgFR4GAbxZUPkw) (code: a982). We expect the directory structure to be the following:
 ```
 <PATH_TO_OPA>
@@ -62,3 +62,110 @@ You will see some new files and directories:
   test_data_pos.csv            # test annotation for positive samples
   test_data_pos_unique.csv     # test annotation for positive samples with different fg/bg pairs 
 ```
+
+## 💻 Training
+To train GraPLUS, use the provided training script:
+
+```
+./train.sh graplus YOUR_EXPERIMENT_NAME
+```
+For additional configurations, you can add optional parameters:
+```
+./train.sh graplus YOUR_EXPERIMENT_NAME --batch_size 64 --d_k 64
+```
+To see the change of losses dynamically, use TensorBoard:
+
+```
+tensorboard --logdir result/YOUR_EXPERIMENT_NAME/tblog --port YOUR_SPECIFIED_PORT
+```
+## 🔥 Inference
+To predict composite images from a trained GraPLUS model, run:
+
+```
+./infer.sh graplus --epoch EPOCH_TO_EVALUATE --eval_type eval
+./infer.sh graplus --epoch EPOCH_TO_EVALUATE --eval_type evaluni --repeat 10
+```
+
+You could also directly use our provided models. For example, if you want to infer our best GraPLUS model, please:
+
+Download the model from the link provided above.
+
+Place it under the models/ directory and extract it.
+
+Run:
+```
+./infer.sh graplus --epoch 21 --eval_type eval
+./infer.sh graplus --epoch 21 --eval_type evaluni --repeat 10
+```
+## 📊 Evaluation
+To evaluate all metrics at once, use the evaluation script:
+```
+./eval.sh graplus EPOCH_TO_EVALUATE
+```
+This will run the following evaluations:
+
+Accuracy evaluation using a binary classifier
+
+FID score evaluation for visual quality
+
+LPIPS score evaluation for diversity
+
+To view summarized results:
+
+```
+python tool/summarize.py --expid YOUR_EXPERIMENT_NAME --eval_type eval
+python tool/summarize.py --expid YOUR_EXPERIMENT_NAME --eval_type evaluni
+```
+Results will be available at result/YOUR_EXPERIMENT_NAME/*_resall.txt.
+
+## ✨ Key Innovations
+Semantic-First Approach: We determine optimal placement using only the foreground object's category without requiring the actual foreground image, significantly reducing computational complexity.
+
+Transfer Learning: We leverage pre-trained scene graph extraction models that incorporate cross-domain knowledge of common object relationships and spatial arrangements.
+
+Edge-Aware Graph Neural Networks: Our model processes scene semantics through structured relationships, preserving and enhancing semantic connections.
+
+Cross-Modal Attention: We align categorical embeddings with enhanced scene features through a dedicated attention mechanism.
+
+Multi-Objective Training: Our approach incorporates semantic consistency constraints alongside adversarial learning.
+
+## 📑 Model Architecture
+GraPLUS consists of four principal components:
+
+Scene Graph Processing: Transforms background images into structured graph representations.
+
+Semantic Enhancement: Maps nodes and edges to rich embeddings and augments them with spatial information.
+
+Graph Transformer Network: Processes object-object interactions through edge-aware attention.
+
+Cross-Attention Module: Computes attention weights between foreground object category and scene features.
+
+This semantic-first design enables contextually appropriate object placements with improved coherence and accuracy compared to pixel-based methods.
+
+## 🖊️ Citation
+If you find GraPLUS useful, please cite our paper:
+
+```
+@article{khaleghi2025graplus,
+  title={GraPLUS: Graph-based Placement Using Semantics for Image Composition},
+  author={Khaleghi, Mir Mohammad and Safayani, Mehran and Mirzaei, Abdolreza},
+  journal={arXiv preprint arXiv:2503.15761},
+  year={2025}
+}
+```
+## 🔗 Other Resources
+Awesome-Object-Placement
+
+Awesome-Image-Composition
+
+## 🙏 Acknowledgements
+Some of the evaluation codes in this repo are borrowed and modified from Faster-RCNN-VG, OPA, FID-Pytorch, GracoNet, and Perceptual Similarity. Thanks to the authors for their great work.
+
+## 📧 Contact
+If you have any technical questions or suggestions, please open a new issue or feel free to contact:
+
+Mir Mohammad Khaleghi (m.khaleghi@ec.iut.ac.ir)
+
+Mehran Safayani (safayani@iut.ac.ir) - Corresponding author
+
+
