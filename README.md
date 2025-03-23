@@ -17,14 +17,14 @@ GraPLUS achieves placement accuracy of 92.1% and an FID score of 28.83 on the OP
 
 We provide models for **TERSE** (CVPR 2019) [[arXiv]](https://arxiv.org/abs/1904.05475), **PlaceNet** (ECCV 2020) [[arXiv]](https://www.ecva.net/papers/eccv_2020/papers_ECCV/papers/123580562.pdf), **GracoNet** (ECCV 2022) [[arXiv]](https://arxiv.org/abs/2207.11464), **CA-GAN** (ICME 2023, Oral) [[paper]](https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=10219885), **CSANet** (BMVC 2024) [[paper]](https://papers.bmvc2024.org/0165.pdf), and our **GraPLUS**:
 
-|     | method   | Accuracy | FID    | LPIPS  | url of model & logs |
-|-----|----------|----------|--------|--------|---------------------|
-| 0   | TERSE    | 0.683    | 47.44  | 0.000  | [Google Drive](https://drive.google.com/file/d/1xxxxxxxxxxxxx/view?usp=sharing) |
-| 1   | PlaceNet | 0.684    | 37.63  | 0.160  | [Google Drive](https://drive.google.com/file/d/1xxxxxxxxxxxxx/view?usp=sharing) |
-| 2   | GracoNet | 0.838    | 29.35  | 0.207  | [Google Drive](https://drive.google.com/file/d/1xxxxxxxxxxxxx/view?usp=sharing) |
-| 3   | CA-GAN   | 0.734    | 25.54  | 0.267  | [Google Drive](https://drive.google.com/file/d/1xxxxxxxxxxxxx/view?usp=sharing) |
-| 4   | CSANet   | 0.803    | 22.42  | 0.264  | [Google Drive](https://drive.google.com/file/d/1xxxxxxxxxxxxx/view?usp=sharing) |
-| 5   | GraPLUS  | 0.921    | 28.83  | 0.055  | [Google Drive](https://drive.google.com/file/d/1xxxxxxxxxxxxx/view?usp=sharing) |
+|     | method   | User Study | Accuracy | FID    | LPIPS  | url of model & logs |
+|-----|----------|------------|----------|--------|--------|---------------------|
+| 0   | TERSE    | -          |   0.683  | 47.44  | 0.000  | [Google Drive](https://drive.google.com/file/d/1xxxxxxxxxxxxx/view?usp=sharing) |
+| 1   | PlaceNet | -          |   0.684  | 37.63  | 0.160  | [Google Drive](https://drive.google.com/file/d/1xxxxxxxxxxxxx/view?usp=sharing) |
+| 2   | [GracoNet](https://github.com/bcmi/GracoNet-Object-Placement) |   0.263 | 0.838 | 29.35 | 0.207 | [Google Drive](https://drive.google.com/file/d/1xxxxxxxxxxxxx/view?usp=sharing) |
+| 3   | CA-GAN   | -          |   0.734  | 25.54  | 0.267  | [Google Drive](https://drive.google.com/file/d/1xxxxxxxxxxxxx/view?usp=sharing) |
+| 4   | [CSANet](https://github.com/CodeGoat24/CSANet) | 0.216 | 0.803 | 22.42 | 0.264 | [Google Drive](https://drive.google.com/file/d/1xxxxxxxxxxxxx/view?usp=sharing) |
+| 5   | GraPLUS  | 0.521      |   0.921  | 28.83  | 0.055  | [Google Drive](https://drive.google.com/file/d/1xxxxxxxxxxxxx/view?usp=sharing) |
 
 ## 🔧 Environment Setup
 
@@ -67,11 +67,11 @@ You will see some new files and directories:
 To train GraPLUS, use the provided training script:
 
 ```
-./train.sh graplus YOUR_EXPERIMENT_NAME
+./train.sh MODEL_NAME YOUR_EXPERIMENT_NAME
 ```
 For additional configurations, you can add optional parameters:
 ```
-./train.sh graplus YOUR_EXPERIMENT_NAME --batch_size 64 --d_k 64
+./train.sh MODEL_NAME YOUR_EXPERIMENT_NAME --batch_size 64 --d_k 64
 ```
 To see the change of losses dynamically, use TensorBoard:
 
@@ -82,8 +82,7 @@ tensorboard --logdir result/YOUR_EXPERIMENT_NAME/tblog --port YOUR_SPECIFIED_POR
 To predict composite images from a trained GraPLUS model, run:
 
 ```
-./infer.sh graplus --epoch EPOCH_TO_EVALUATE --eval_type eval
-./infer.sh graplus --epoch EPOCH_TO_EVALUATE --eval_type evaluni --repeat 10
+./infer.sh MODEL_NAME --epoch EPOCH_TO_EVALUATE 
 ```
 
 You could also directly use our provided models. For example, if you want to infer our best GraPLUS model, please:
@@ -94,8 +93,7 @@ Place it under the models/ directory and extract it.
 
 Run:
 ```
-./infer.sh graplus --epoch 21 --eval_type eval
-./infer.sh graplus --epoch 21 --eval_type evaluni --repeat 10
+./infer.sh YOUR_EXPERIMENT_NAME --epoch EPOCH_NUMBER 
 ```
 ## 📊 Evaluation
 To evaluate all metrics at once, use the evaluation script:
