@@ -1,0 +1,777 @@
+import os
+import logging
+import datetime
+from PIL import Image
+import torch
+
+#####
+import csv
+import pandas as pd
+import matplotlib.pyplot as plt
+import re
+
+class AccMeter():
+    '''Computes and stores the correctness of the discriminator prediction'''
+    def __init__(self):
+        self.reset()
+    
+    def reset(self):
+        self.total_correct_num = 0
+        self.total_num = 0
+        self.avg = 0
+
+    def update(self, correct_num, n):
+        if n != 0:
+            self.total_correct_num += correct_num 
+            self.total_num += n
+            self.avg = self.total_correct_num / self.total_num
+
+class AverageMeter():
+    """Computes and stores the average and current value"""
+    def __init__(self):
+        self.reset()
+
+    def reset(self):
+        self.val = 0
+        self.avg = 0
+        self.sum = 0
+        self.count = 0
+
+    def update(self, val, n=1):
+        self.val = val
+        self.sum += val * n
+        self.count += n
+        self.avg = self.sum / self.count
+
+def make_logger(log_file):
+    logger = logging.getLogger()
+    logger.setLevel(logging.INFO)
+
+    logfile = log_file
+    fh = logging.FileHandler(logfile)
+    fh.setLevel(logging.DEBUG)
+
+    ch = logging.StreamHandler()
+    ch.setLevel(logging.INFO)
+
+    formatter = logging.Formatter("%(asctime)s - %(filename)s[line:%(lineno)d] - %(levelname)s: %(message)s")
+    fh.setFormatter(formatter)
+    ch.setFormatter(formatter)
+
+    logger.addHandler(fh)
+    logger.addHandler(ch)
+    logger.info('logfile = {}'.format(logfile))
+    return logger
+
+
+# At the beginning of your script where you set up the logger, modify the logger format
+def make_logger_new(log_path):
+    logger = logging.getLogger()
+    logger.setLevel(logging.INFO)
+    
+    # Clear any existing handlers
+    logger.handlers.clear()
+    
+    # Create a file handler
+    fh = logging.FileHandler(log_path)
+    fh.setLevel(logging.INFO)
+    fh.setFormatter(logging.Formatter('%(asctime)s - %(name)s[line:%(lineno)d] - %(levelname)s: %(message)s'))
+    
+    # Create a console handler with a simpler format
+    ch = logging.StreamHandler()
+    ch.setLevel(logging.INFO)
+    ch.setFormatter(logging.Formatter('%(message)s'))  # Only show the message
+    
+    logger.addHandler(fh)
+    logger.addHandler(ch)
+    
+    return logger
+
+
+def make_dirs(save_dir):
+    is_old_exp = os.path.exists(save_dir)
+
+    model_dir = os.path.join(save_dir, 'models')
+    sample_dir = os.path.join(save_dir, 'sample')
+    tblog_dir = os.path.join(save_dir, 'tblog')
+    log_path = os.path.join(save_dir, 'log-{}'.format(datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S-%f')))
+
+    if not is_old_exp:
+        os.makedirs(save_dir)
+        os.mkdir(model_dir)
+        os.mkdir(sample_dir)
+        os.mkdir(tblog_dir)
+
+    return {
+        'save_dir': save_dir,
+        'model_dir': model_dir,
+        'sample_dir': sample_dir,
+        'tblog_dir': tblog_dir,
+        'log_path': log_path
+    }, is_old_exp
+
+def save(model_dir, model, opt, logger=None):
+    if not os.path.exists(model_dir):
+        os.makedirs(model_dir)
+    sav_path = os.path.join(model_dir, '{}.pth'.format(opt.epoch))
+    if logger is None:
+        print("=> saving checkpoint to '{}'".format(sav_path))
+    else:
+        logger.info("=> saving checkpoint to '{}'".format(sav_path))
+
+    torch.save({
+        'epoch': opt.epoch,
+        'model': model.state_dict(),
+        'opt': opt,
+        'optimizer': model.optimizer_dict(),
+    }, sav_path)
+
+def resume(path, model, resume_list, strict=False, logger=None):
+    if path is None:
+        return model, 0
+
+    assert (os.path.exists(path))
+    if logger is None:
+        print("=> loading {} from checkpoint '{}' with strict={}".format(resume_list, path, strict))
+    else:
+        logger.info("=> loading {} from checkpoint '{}' with strict={}".format(resume_list, path, strict))
+    checkpoint = torch.load(path)
+
+    pretrained_model_dict = checkpoint['model']
+    model_dict = model.state_dict()
+    for k in pretrained_model_dict:
+        if k in resume_list:
+            model_dict[k].update(pretrained_model_dict[k])
+    model.load_state_dict(model_dict, strict=strict)
+
+    pretrained_opt_dict = checkpoint['optimizer']
+    opt_dict = model.optimizer_dict()
+    for k in pretrained_opt_dict:
+        if k in resume_list:
+            opt_dict[k].update(pretrained_opt_dict[k])
+    model.load_opt_state_dict(opt_dict)
+
+    epoch = checkpoint['epoch']
+    return model, epoch
+
+
+
+################################################################### generator pretraining save/resume tools
+
+
+
+###################################################################
+###################################################################
+################################################################### plotting function for all new code versions 
+def plot_from_csv(csv_file_path, exp_name, use_mean=False, mean_interval=10):
+    # Read the CSV file
+    df = pd.read_csv(csv_file_path)
+    exp_name = str(exp_name)
+    
+    # Extract epochs and batches
+    epochs = df['Epoch']
+    batches = df['Batch']
+    
+    # Create a continuous batch counter
+    max_batches = max(batches)
+    df["continuous_batches"] = (batches + 9) + ((epochs - 1) * max_batches)
+    continuous_batches = df['continuous_batches']
+    
+    # Prepare the directory for saving plots
+    plots_dir = os.path.join(os.path.dirname(csv_file_path), f"plots_{exp_name}")
+    loss_plots = os.path.join(plots_dir, "loss_plots")
+    Disc_Acc_plots = os.path.join(plots_dir, "Disc_Acc_plots")
+    os.makedirs(plots_dir, exist_ok=True)
+    os.makedirs(loss_plots, exist_ok=True)
+    os.makedirs(Disc_Acc_plots, exist_ok=True)
+    
+    # Extract columns containing "loss" or "avg"
+    loss_columns = [col for col in df.columns if 'loss' in col.lower()]
+    Disc_Acc_columns = [col for col in df.columns if 'avg' in col.lower()]
+    
+    def get_mean_data(df, columns, interval):
+        """
+        Calculate the mean of every `interval` rows for specified columns.
+        Retain the 'Epoch' and 'Batch' columns.
+        """
+        # Calculate the mean for the specified columns
+        mean_df = df[columns].groupby(df.index // interval).mean()
+        
+        # Retain the first 'Epoch' and 'Batch' values for each interval
+        mean_df['Epoch'] = df['Epoch'].groupby(df.index // interval).first()
+        mean_df['Batch'] = df['Batch'].groupby(df.index // interval).first()
+        mean_df['continuous_batches'] = df['continuous_batches'].groupby(df.index // interval).first()
+        
+        return mean_df
+
+
+    if use_mean:
+        print(f"Using mean over every {mean_interval} rows")
+        df_loss = get_mean_data(df, loss_columns, mean_interval)
+        df_acc = get_mean_data(df, Disc_Acc_columns, mean_interval)
+        continuous_batches = df_loss['continuous_batches']
+    else:
+        df_loss = df
+        df_acc = df
+    
+    print("Disc_Acc_columns: ", Disc_Acc_columns)
+    print("loss_columns: ", loss_columns)
+    print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
+
+    def acc_plot(df, Disc_Acc_columns):
+        """
+        Function to plot accuracy-related columns and save both individual and combined plots.
+        """
+        # Dictionary to map column names to more readable titles
+        Acc_title_dict = {}
+        # Disc_Acc_columns:  ['Disc_avg', 'g_avg', 'dataset_avg', 'dataset_avg_real', 'dataset_avg_fake']
+        for col in Disc_Acc_columns:
+            if "Disc" in col:
+                continue
+            elif "g_a" in col:
+                Acc_title_dict[col] = "Generator"
+            elif "dataset" in col and "real" not in col and "fake" not in col:
+                Acc_title_dict[col] = "Dataset"
+            elif "dataset" in col and "real" in col:
+                Acc_title_dict[col] = "Dataset_Real"
+            elif "dataset" in col and "fake" in col:
+                Acc_title_dict[col] = "Dataset_Fake"
+
+        print("Acc_title_dict: ", Acc_title_dict)
+        # Plot individual accuracy metrics
+        for col in Disc_Acc_columns:
+            plt.figure(figsize=(10, 6))
+            plt.plot(continuous_batches, df[col], marker='o', linestyle='-', markersize=1, label=col)
+            
+            # Add vertical lines for each epoch change
+            unique_epochs = df['Epoch'].unique()
+            epoch_start_batches = [df[df['Epoch'] == epoch]['continuous_batches'].min() for epoch in unique_epochs]
+            
+            plt.xticks(epoch_start_batches, unique_epochs)
+            if "Disc" in col:
+                plt.title(f'Total Discriminator Accuracy ------------ {exp_name}')
+            else:
+                plt.title(f'Discriminator Accuracy on {Acc_title_dict[col]} Data ------------ {exp_name}')
+            
+            plt.xlabel('Epoch')
+            plt.ylabel(col)
+            plt.grid(True)
+            
+            # Save the individual plot
+            if "Disc" in col:
+                plot_file_path = os.path.join(Disc_Acc_plots, f'Disc_acc.png')
+            else:
+                plot_file_path = os.path.join(Disc_Acc_plots, f'Disc_acc_{Acc_title_dict[col]}.png')
+            
+            plt.savefig(plot_file_path)
+            plt.close()
+            print(f"Plot saved as {plot_file_path}")
+
+        # Combined plot for all accuracy metrics
+        plt.figure(figsize=(12, 8))
+        for col in Disc_Acc_columns:
+            if "Disc" in col:
+                plt.plot(continuous_batches, df[col], marker='o', linestyle='--', linewidth=5, markersize=1, label="Discriminator in total")
+            else:
+                plt.plot(continuous_batches, df[col], marker='o', linestyle='-', markersize=1, label="on "+Acc_title_dict[col]+" data")
+        
+        # Add vertical lines for each epoch change
+        unique_epochs = df['Epoch'].unique()
+        epoch_start_batches = [df[df['Epoch'] == epoch]['continuous_batches'].min() for epoch in unique_epochs]
+        
+        plt.xticks(epoch_start_batches, unique_epochs)
+        plt.title(f'Discriminator Accuracy change during training ------------ {exp_name}')
+        plt.xlabel('Epoch')
+        plt.ylabel('Accuracy')
+        plt.legend(loc='best')
+        plt.grid(True)
+        
+        # Save the combined plot
+        combined_plot_file_path = os.path.join(plots_dir, f'{exp_name}_combined_disc_acc.png')
+        plt.savefig(combined_plot_file_path)
+        plt.close()
+        print(f"Combined plot saved as {combined_plot_file_path}")
+
+    def plot_loss(df, loss_columns):
+        """
+        Function to plot loss-related columns.
+        """
+        for loss in loss_columns:
+            plt.figure(figsize=(10, 6))
+            plt.plot(continuous_batches, df[loss], marker='o', linestyle='-', markersize=1, label=loss)
+            
+            unique_epochs = epochs.unique()
+            epoch_start_batches = [df[df['Epoch'] == epoch]['continuous_batches'].min() for epoch in unique_epochs]
+            
+            plt.xticks(epoch_start_batches, unique_epochs)
+            plt.title(f'{loss} ------ {exp_name}')
+            plt.xlabel('Epoch')
+            plt.ylabel(loss)
+            plt.grid(True)
+            
+            plot_file_path = os.path.join(loss_plots, f'loss_plot_{loss}.png')
+            plt.savefig(plot_file_path)
+            plt.close()
+            print(f"Plot saved as {plot_file_path}")
+
+        # Combined plot for all loss columns
+        plt.figure(figsize=(10, 6))
+        for loss in loss_columns:
+            plt.plot(continuous_batches, df[loss], marker='o', linestyle='-', markersize=0.5, label=loss)
+
+        plt.xticks(epoch_start_batches, unique_epochs)
+        plt.title(f'Losses change during training ------- Model: {exp_name}')
+        plt.xlabel('Epoch')
+        plt.ylabel('Loss Values')
+        plt.legend()
+        plt.grid(True)
+        
+        combined_plot_file_path = os.path.join(plots_dir, f'{exp_name}_LossPlots.png')
+        plt.savefig(combined_plot_file_path)
+        plt.close()
+        print(f"Combined plot saved as {combined_plot_file_path}")
+
+    # Plot accuracy and loss using either raw data or mean data
+    acc_plot(df_acc, Disc_Acc_columns)
+    plot_loss(df_loss, loss_columns)
+
+###################################################################
+def save_loss_to_csv_1(file_path, epoch, batch, 
+                         G_loss, g_loss, g_rec_loss,
+                         d_real_loss, d_fake_loss, 
+                         Disc_corr_num, Disc_tot_num, Disc_avg,
+                         g_corr_num, g_tot_num, g_avg,
+                         dst_corr_num, dst_tot_num, dst_avg,
+                         dst_corr_num_real,dst_tot_num_real, dst_avg_real,
+                         dst_corr_num_fake,dst_tot_num_fake, dst_avg_fake  ):
+    
+    # Check if the file already exists
+    file_exists = os.path.isfile(file_path)
+    
+    # Format the loss values to 3 decimal places
+    G_loss = f"{G_loss:.3f}"
+    g_loss = f"{g_loss:.3f}"
+    g_rec_loss = f"{g_rec_loss:.3f}"
+
+    d_real_loss = f"{d_real_loss:.3f}"
+    d_fake_loss = f"{d_fake_loss:.3f}"
+
+    Disc_corr_num = f"{Disc_corr_num}"
+    Disc_tot_num = f"{Disc_tot_num}"
+    Disc_avg = f"{Disc_avg:.3f}"
+
+    g_corr_num = f"{g_corr_num}"
+    g_tot_num = f"{g_tot_num}"
+    g_avg = f"{g_avg:.3f}"
+
+    dst_corr_num = f"{dst_corr_num}"
+    dst_tot_num = f"{dst_tot_num}"
+    dst_avg = f"{dst_avg:.3f}"
+    
+    dst_corr_num_real = f"{dst_corr_num_real}"
+    dst_tot_num_real = f"{dst_tot_num_real}"
+    dst_avg_real = f"{dst_avg_real:.3f}"
+    
+    dst_corr_num_fake = f"{dst_corr_num_fake}"
+    dst_tot_num_fake = f"{dst_tot_num_fake}"
+    dst_avg_fake = f"{dst_avg_fake:.3f}"
+
+    with open(file_path, mode='a', newline='') as file:
+        writer = csv.writer(file)
+        
+        # If the file does not exist, write the header
+        if not file_exists:
+            writer.writerow(['Epoch', 'Batch', 
+                             'G_Loss', 'g_loss', 'g_rec_loss', 
+                             'D_Real_Loss', 'D_Fake_Loss',
+                             'Disc_corr_num', 'Disc_tot_num', 'Disc_avg',
+                             'g_corr_num', 'g_tot_num', 'g_avg',
+                             'dataset_corr_num', 'dataset_tot_num', 'dataset_avg',
+                             'dataset_corr_num_real','dataset_tot_num_real', 'dataset_avg_real',
+                             'dataset_corr_num_fake','dataset_tot_num_fake', 'dataset_avg_fake'])
+        
+        # Write the data row
+        writer.writerow([epoch, batch,
+                          G_loss, g_loss, g_rec_loss,
+                          d_real_loss, d_fake_loss, 
+                          Disc_corr_num, Disc_tot_num, Disc_avg,
+                          g_corr_num, g_tot_num, g_avg,
+                          dst_corr_num, dst_tot_num, dst_avg,
+                          dst_corr_num_real,dst_tot_num_real, dst_avg_real,
+                          dst_corr_num_fake,dst_tot_num_fake, dst_avg_fake])
+        
+###################################################################
+###################################################################
+def save_loss_to_csv_1_1(file_path, epoch, batch, 
+                         G_loss, g_loss,
+                         d_real_loss, d_fake_loss, 
+                         Disc_corr_num, Disc_tot_num, Disc_avg,
+                         g_corr_num, g_tot_num, g_avg,
+                         dst_corr_num, dst_tot_num, dst_avg,
+                         dst_corr_num_real,dst_tot_num_real, dst_avg_real,
+                         dst_corr_num_fake,dst_tot_num_fake, dst_avg_fake  ):
+    
+    # Check if the file already exists
+    file_exists = os.path.isfile(file_path)
+    
+    # Format the loss values to 3 decimal places
+    G_loss = f"{G_loss:.3f}"
+    g_loss = f"{g_loss:.3f}"
+
+    d_real_loss = f"{d_real_loss:.3f}"
+    d_fake_loss = f"{d_fake_loss:.3f}"
+
+    Disc_corr_num = f"{Disc_corr_num}"
+    Disc_tot_num = f"{Disc_tot_num}"
+    Disc_avg = f"{Disc_avg:.3f}"
+
+    g_corr_num = f"{g_corr_num}"
+    g_tot_num = f"{g_tot_num}"
+    g_avg = f"{g_avg:.3f}"
+
+    dst_corr_num = f"{dst_corr_num}"
+    dst_tot_num = f"{dst_tot_num}"
+    dst_avg = f"{dst_avg:.3f}"
+    
+    dst_corr_num_real = f"{dst_corr_num_real}"
+    dst_tot_num_real = f"{dst_tot_num_real}"
+    dst_avg_real = f"{dst_avg_real:.3f}"
+    
+    dst_corr_num_fake = f"{dst_corr_num_fake}"
+    dst_tot_num_fake = f"{dst_tot_num_fake}"
+    dst_avg_fake = f"{dst_avg_fake:.3f}"
+
+    with open(file_path, mode='a', newline='') as file:
+        writer = csv.writer(file)
+        
+        # If the file does not exist, write the header
+        if not file_exists:
+            writer.writerow(['Epoch', 'Batch', 
+                             'G_Loss', 'g_loss', 
+                             'D_Real_Loss', 'D_Fake_Loss',
+                             'Disc_corr_num', 'Disc_tot_num', 'Disc_avg',
+                             'g_corr_num', 'g_tot_num', 'g_avg',
+                             'dataset_corr_num', 'dataset_tot_num', 'dataset_avg',
+                             'dataset_corr_num_real','dataset_tot_num_real', 'dataset_avg_real',
+                             'dataset_corr_num_fake','dataset_tot_num_fake', 'dataset_avg_fake'])
+        
+        # Write the data row
+        writer.writerow([epoch, batch,
+                          G_loss, g_loss,
+                          d_real_loss, d_fake_loss, 
+                          Disc_corr_num, Disc_tot_num, Disc_avg,
+                          g_corr_num, g_tot_num, g_avg,
+                          dst_corr_num, dst_tot_num, dst_avg,
+                          dst_corr_num_real,dst_tot_num_real, dst_avg_real,
+                          dst_corr_num_fake,dst_tot_num_fake, dst_avg_fake])
+        
+
+
+###################################################################
+def save_loss_to_csv_2(file_path, epoch, batch, 
+                         G_loss, g_loss, g_rec_loss,g_ndiv_loss,
+                         d_real_loss, d_fake_loss, 
+                         Disc_corr_num, Disc_tot_num, Disc_avg,
+                         g_corr_num, g_tot_num, g_avg,
+                         dst_corr_num, dst_tot_num, dst_avg,
+                         dst_corr_num_real,dst_tot_num_real, dst_avg_real,
+                         dst_corr_num_fake,dst_tot_num_fake, dst_avg_fake  ):
+    
+    # Check if the file already exists
+    file_exists = os.path.isfile(file_path)
+    
+    # Format the loss values to 3 decimal places
+    G_loss = f"{G_loss:.3f}"
+    g_loss = f"{g_loss:.3f}"
+    g_rec_loss = f"{g_rec_loss:.3f}"
+    g_ndiv_loss = f"{g_ndiv_loss:.3f}"
+
+    d_real_loss = f"{d_real_loss:.3f}"
+    d_fake_loss = f"{d_fake_loss:.3f}"
+
+    Disc_corr_num = f"{Disc_corr_num}"
+    Disc_tot_num = f"{Disc_tot_num}"
+    Disc_avg = f"{Disc_avg:.3f}"
+
+    g_corr_num = f"{g_corr_num}"
+    g_tot_num = f"{g_tot_num}"
+    g_avg = f"{g_avg:.3f}"
+
+    dst_corr_num = f"{dst_corr_num}"
+    dst_tot_num = f"{dst_tot_num}"
+    dst_avg = f"{dst_avg:.3f}"
+    
+    dst_corr_num_real = f"{dst_corr_num_real}"
+    dst_tot_num_real = f"{dst_tot_num_real}"
+    dst_avg_real = f"{dst_avg_real:.3f}"
+    
+    dst_corr_num_fake = f"{dst_corr_num_fake}"
+    dst_tot_num_fake = f"{dst_tot_num_fake}"
+    dst_avg_fake = f"{dst_avg_fake:.3f}"
+
+    with open(file_path, mode='a', newline='') as file:
+        writer = csv.writer(file)
+        
+        # If the file does not exist, write the header
+        if not file_exists:
+            writer.writerow(['Epoch', 'Batch', 
+                             'G_Loss', 'g_loss', 'g_rec_loss', 'g_ndiv_loss',
+                             'D_Real_Loss', 'D_Fake_Loss',
+                             'Disc_corr_num', 'Disc_tot_num', 'Disc_avg',
+                             'g_corr_num', 'g_tot_num', 'g_avg',
+                             'dataset_corr_num', 'dataset_tot_num', 'dataset_avg',
+                             'dataset_corr_num_real','dataset_tot_num_real', 'dataset_avg_real',
+                             'dataset_corr_num_fake','dataset_tot_num_fake', 'dataset_avg_fake'])
+        
+        # Write the data row
+        writer.writerow([epoch, batch,
+                          G_loss, g_loss, g_rec_loss,g_ndiv_loss,
+                          d_real_loss, d_fake_loss, 
+                          Disc_corr_num, Disc_tot_num, Disc_avg,
+                          g_corr_num, g_tot_num, g_avg,
+                          dst_corr_num, dst_tot_num, dst_avg,
+                          dst_corr_num_real,dst_tot_num_real, dst_avg_real,
+                          dst_corr_num_fake,dst_tot_num_fake, dst_avg_fake])
+        
+
+
+
+###################################################################
+
+def save_loss_to_csv_improved(file_path, epoch, batch, meters):
+    """
+    Saves the current metrics to a CSV file dynamically based on the meters dictionary.
+
+    Args:
+        file_path (str): Path to the CSV file.
+        epoch (int): Current epoch number.
+        batch (int): Current batch number.
+        meters (dict): Dictionary containing AverageMeter instances for various metrics.
+                      Keys should be strings representing metric names.
+                      Values should be AverageMeter instances with an 'avg' attribute.
+    """
+    
+    # Check if the file already exists to determine if headers need to be written
+    file_exists = os.path.isfile(file_path)
+    
+    # Extract metric names and their average values
+    metric_names = list(meters.keys())
+    metric_values = [f"{meters[name].avg:.3f}" for name in metric_names]
+    
+    # Define the order of columns: Epoch, Batch, followed by metrics
+    columns = ['Epoch', 'Batch'] + metric_names
+    
+    # Prepare the row data: epoch, batch, followed by metric values
+    row = [epoch, batch] + metric_values
+    
+    # Open the CSV file in append mode
+    with open(file_path, mode='a', newline='') as file:
+        writer = csv.writer(file)
+        
+        # Write headers if the file does not exist
+        if not file_exists:
+            writer.writerow(columns)
+        
+        # Write the data row
+        writer.writerow(row)
+
+
+def plot_metrics_from_csv_improved(csv_file_path, exp_name, use_mean=False, mean_interval=10):
+    """
+    Reads a CSV file containing training metrics and plots all loss and accuracy metrics.
+    
+    Args:
+        csv_file_path (str): Path to the CSV file containing training metrics.
+        exp_name (str): Name of the experiment (used for plot titles and directories).
+        use_mean (bool, optional): If True, plots the mean of metrics over specified intervals. Defaults to False.
+        mean_interval (int, optional): Number of rows to average over when use_mean is True. Defaults to 10.
+    """
+    
+    # Check if the CSV file exists
+    if not os.path.isfile(csv_file_path):
+        print(f"CSV file not found at {csv_file_path}")
+        return
+    
+    # Read the CSV file
+    df = pd.read_csv(csv_file_path)
+    exp_name = str(exp_name)
+    
+    # Extract epochs and batches
+    epochs = df['Epoch']
+    batches = df['Batch']
+    
+    # Determine the maximum number of batches to compute continuous_batches
+    max_batches = batches.max()
+    
+    # Compute continuous_batches
+    df["continuous_batches"] = (batches + 1) + ((epochs - 1) * max_batches)
+    continuous_batches = df['continuous_batches']
+    
+    # Prepare directories for saving plots
+    plots_dir = os.path.join(os.path.dirname(csv_file_path), f"plots_{exp_name}")
+    loss_plots_dir = os.path.join(plots_dir, "loss_plots")
+    acc_plots_dir = os.path.join(plots_dir, "acc_plots")
+    os.makedirs(loss_plots_dir, exist_ok=True)
+    os.makedirs(acc_plots_dir, exist_ok=True)
+    
+    # Identify loss and accuracy columns
+    loss_columns = [col for col in df.columns if 'loss' in col.lower()]
+    acc_columns = [col for col in df.columns if 'acc' in col.lower()]
+    
+    print(f"Identified Loss Columns: {loss_columns}")
+    print(f"Identified Accuracy Columns: {acc_columns}")
+    print("=====================================================")
+    
+    def compute_mean(df, interval):
+        """
+        Computes the mean of every `interval` rows.
+        """
+        return df.groupby(df.index // interval).mean()
+    
+    # If use_mean is True, compute the mean over specified intervals
+    if use_mean:
+        print(f"Using mean over every {mean_interval} rows.")
+        df_loss = compute_mean(df, mean_interval)
+        df_acc = compute_mean(df, mean_interval)
+        continuous_batches_loss = df_loss['continuous_batches']
+        continuous_batches_acc = df_acc['continuous_batches']
+    else:
+        df_loss = df
+        df_acc = df
+        continuous_batches_loss = continuous_batches
+        continuous_batches_acc = continuous_batches
+    
+    # Function to plot individual metrics
+    def plot_individual_metrics(df, metric_columns, continuous_batches, save_dir, metric_type='Loss'):
+        """
+        Plots individual metrics and saves them.
+        
+        Args:
+            df (pd.DataFrame): DataFrame containing the metrics.
+            metric_columns (list): List of metric column names to plot.
+            continuous_batches (pd.Series): Continuous batch counter for x-axis.
+            save_dir (str): Directory to save the plots.
+            metric_type (str): Type of metric ('Loss' or 'Accuracy') for titles.
+        """
+        for metric in metric_columns:
+            plt.figure(figsize=(10, 6))
+            plt.plot(continuous_batches, df[metric], marker='o', linestyle='-', markersize=1, label=metric)
+            
+            # Add vertical lines for each epoch change
+            unique_epochs = df['Epoch'].unique()
+            epoch_start_batches = [df[df['Epoch'] == epoch]['continuous_batches'].min() for epoch in unique_epochs]
+            plt.xticks(epoch_start_batches, unique_epochs)
+            
+            plt.title(f'{metric} over Training - {exp_name}')
+            plt.xlabel('Epoch')
+            plt.ylabel(metric)
+            plt.grid(True)
+            plt.legend()
+            
+            # Save the individual plot
+            plot_file_path = os.path.join(save_dir, f'{metric}.png')
+            plt.savefig(plot_file_path)
+            plt.close()
+            print(f"Saved {metric_type} plot: {plot_file_path}")
+    
+    # Function to plot combined metrics
+    def plot_combined_metrics(df, metric_columns, continuous_batches, save_dir, metric_type='Loss'):
+        """
+        Plots combined metrics on a single plot and saves it.
+        
+        Args:
+            df (pd.DataFrame): DataFrame containing the metrics.
+            metric_columns (list): List of metric column names to plot.
+            continuous_batches (pd.Series): Continuous batch counter for x-axis.
+            save_dir (str): Directory to save the plot.
+            metric_type (str): Type of metric ('Loss' or 'Accuracy') for titles.
+        """
+        plt.figure(figsize=(12, 8))
+        for metric in metric_columns:
+            plt.plot(continuous_batches, df[metric], marker='o', linestyle='-', markersize=1, label=metric)
+        
+        # Add vertical lines for each epoch change
+        unique_epochs = df['Epoch'].unique()
+        epoch_start_batches = [df[df['Epoch'] == epoch]['continuous_batches'].min() for epoch in unique_epochs]
+        plt.xticks(epoch_start_batches, unique_epochs)
+        
+        plt.title(f'Combined {metric_type} Metrics over Training - {exp_name}')
+        plt.xlabel('Epoch')
+        plt.ylabel(f'{metric_type} Values')
+        plt.grid(True)
+        plt.legend()
+        
+        # Save the combined plot
+        combined_plot_file_path = os.path.join(plots_dir, f'{exp_name}_combined_disc_{metric_type}.png')
+
+        plt.savefig(combined_plot_file_path)
+        plt.close()
+        print(f"Saved Combined {metric_type} plot: {combined_plot_file_path}")
+    
+    # Plot individual loss metrics
+    plot_individual_metrics(df_loss, loss_columns, continuous_batches_loss, loss_plots_dir, metric_type='Loss')
+    
+    # Plot individual accuracy metrics
+    plot_individual_metrics(df_acc, acc_columns, continuous_batches_acc, acc_plots_dir, metric_type='Accuracy')
+    
+    # Plot combined loss metrics
+    if loss_columns:
+        plot_combined_metrics(df_loss, loss_columns, continuous_batches_loss, loss_plots_dir, metric_type='Loss')
+    
+    # Plot combined accuracy metrics
+    if acc_columns:
+        plot_combined_metrics(df_acc, acc_columns, continuous_batches_acc, acc_plots_dir, metric_type='Accuracy')
+    
+    print("=====================================================")
+    print("Plotting completed successfully.")
+
+
+
+
+#########################################################################
+def save_loss_to_csv_wgan(csv_file_path, epoch, batch,
+                         G_total_loss, g_adv_loss, g_rec_loss,
+                         critic_real_data_loss, critic_fake_data_loss, 
+                         critic_fake_gen_loss, critic_fake_loss,
+                         wasserstein_dist, gradient_penalty,
+                         real_score, fake_score, fake_data_score):
+    """
+    Save WGAN-GP training metrics to CSV with separated critic losses
+    Args:
+        csv_file_path: Path to save the CSV file
+        epoch, batch: Training progress indicators
+        G_total_loss, g_adv_loss, g_rec_loss: Generator losses
+        critic_real_data_loss: Critic loss on real data
+        critic_fake_data_loss: Critic loss on fake data from dataset
+        critic_fake_gen_loss: Critic loss on generated fake data
+        critic_fake_loss: Combined fake losses (fake_data + fake_gen)
+        wasserstein_dist, gradient_penalty: WGAN-GP specific metrics
+        real_score, fake_score, fake_data_score: Raw critic scores
+    """
+    import csv
+    import os
+
+    # Create file with headers if it doesn't exist
+    if not os.path.exists(csv_file_path):
+        with open(csv_file_path, 'w', newline='') as f:
+            writer = csv.writer(f)
+            writer.writerow([
+                'Epoch', 'Batch',
+                'G_total_Loss', 'G_Adv_Loss', 'G_Rec_Loss',
+                'Critic_Real_Data_Loss', 'Critic_Fake_Data_Loss', 
+                'Critic_Fake_Gen_Loss', 'Critic_Combined_Fake_Loss',
+                'Wasserstein_Distance', 'Gradient_Penalty',
+                'Real_Score', 'Fake_Score', 'Fake_Data_Score'
+            ])
+
+    # Append the current values
+    with open(csv_file_path, 'a', newline='') as f:
+        writer = csv.writer(f)
+        writer.writerow([
+            epoch, batch,
+            G_total_loss, g_adv_loss, g_rec_loss,
+            critic_real_data_loss, critic_fake_data_loss, 
+            critic_fake_gen_loss, critic_fake_loss,
+            wasserstein_dist, gradient_penalty,
+            real_score, fake_score, fake_data_score
+        ])
