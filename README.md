@@ -33,3 +33,32 @@ Install Python 3.6 and PyTorch 1.9.1 (require CUDA >= 10.2):
 conda create -n graplus python=3.6
 conda activate graplus
 conda install pytorch==1.9.1 torchvision==0.10.1 torchaudio==0.9.1 cudatoolkit=10.2 -c pytorch
+```
+
+
+
+##🌓 Data Preparation
+Download and extract [OPA](https://github.com/bcmi/Object-Placement-Assessment-Dataset-OPA) dataset from the official link: [google drive](https://drive.google.com/file/d/133Wic_nSqfrIajDnnxwvGzjVti-7Y6PF/view?usp=sharing) or [baidu disk](https://pan.baidu.com/s/1IzVLcXWLFgFR4GAbxZUPkw) (code: a982). We expect the directory structure to be the following:
+```
+<PATH_TO_OPA>
+  background/       # background images
+  foreground/       # foreground images with masks
+  composite/        # composite images with masks
+  train_set.csv     # train annotation
+  test_set.csv      # test annotation
+```
+
+Then, make some preprocessing:
+```
+python tool/preprocess.py --data_root <PATH_TO_OPA>
+```
+You will see some new files and directories:
+```
+<PATH_TO_OPA>
+  com_pic_testpos299/          # test set positive composite images (resized to 299)
+  train_data.csv               # transformed train annotation
+  train_data_pos.csv           # train annotation for positive samples
+  test_data.csv                # transformed test annotation
+  test_data_pos.csv            # test annotation for positive samples
+  test_data_pos_unique.csv     # test annotation for positive samples with different fg/bg pairs 
+```
