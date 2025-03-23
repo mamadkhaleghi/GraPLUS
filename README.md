@@ -1,12 +1,11 @@
-**GracoNet**: Learning Object Placement via Dual-path Graph Completion
+**GraPLUS**
 ========
 
-Official PyTorch Implementation for **GracoNet** (**GRA**ph **CO**mpletion **NET**work).
+Official PyTorch Implementation for **GraPLUS**.
 
 > **Learning Object Placement via Dual-path Graph Completion** [[arXiv]](https://arxiv.org/abs/2207.11464)
 >
-> Siyuan Zhou, Liu Liu, Li Niu, Liqing Zhang<br>
-> Accepted by **ECCV2022**.
+> Mir Mohammad Khaleghi, Mehran Safayani, Abdolreza Mirzaee<br>
 
 **Object placement methods can be divided into generative methods (*e.g.*, [TERSE](https://arxiv.org/abs/1904.05475), [PlaceNet](https://www.ecva.net/papers/eccv_2020/papers_ECCV/papers/123580562.pdf), [GracoNet](https://arxiv.org/abs/2207.11464)).
 
