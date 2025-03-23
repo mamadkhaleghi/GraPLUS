@@ -89,16 +89,18 @@ You could also directly use our provided models. For example, if you want to inf
 
 Download the model from the link provided above.
 
-Place it under the models/ directory and extract it.
+Place it under the **result/**   directory and extract it.
 
 Run:
 ```
 ./infer.sh YOUR_EXPERIMENT_NAME --epoch EPOCH_NUMBER 
 ```
+
+
 ## 📊 Evaluation
 To evaluate all metrics at once, use the evaluation script:
 ```
-./eval.sh graplus EPOCH_TO_EVALUATE
+./eval.sh YOUR_EXPERIMENT_NAME EPOCH_TO_EVALUATE
 ```
 This will run the following evaluations:
 
