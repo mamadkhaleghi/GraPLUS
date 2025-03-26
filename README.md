@@ -141,7 +141,6 @@ python tool/setup_data.py --all
 # Or selectively setup only what you need:
 # python tool/setup_data.py --opa  # Only OPA dataset
 # python tool/setup_data.py --sg   # Only Scene Graphs
-# python tool/setup_data.py --gpt2 # Only GPT-2 embeddings
 ```
 Alternatively, you can follow the manual setup instructions for each dataset below:
 
