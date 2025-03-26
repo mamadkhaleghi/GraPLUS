@@ -26,6 +26,7 @@ Alternatively, you can follow the manual setup instructions for each dataset bel
 
 ## 🖼️ OPA Dataset
 The Object Placement Assessment (OPA) dataset is a benchmark for evaluating object placement methods. It contains background images, foreground objects with masks, and composite images with annotations.
+![opa](../images/opa.png)
 ### Manual Setup
 
 1. Download and extract the OPA dataset from [Google Drive](https://drive.google.com/file/d/133Wic_nSqfrIajDnnxwvGzjVti-7Y6PF/view?usp=sharing) or [Baidu Disk](https://pan.baidu.com/s/1IzVLcXWLFgFR4GAbxZUPkw) (code: a982)
@@ -123,6 +124,7 @@ These scene graphs are generated using a pre-trained **Neural-MOTIFS** model ope
 
 
 ### Scene Graph Generation Details
+![sgg](../images/sgg.png)
 
 The scene graphs were generated using the **Neural-MOTIFS** model (via the [Scene-Graph-Benchmark.pytorch](https://github.com/KaihuaTang/Scene-Graph-Benchmark.pytorch) implementation) operating in **Total Direct Effect (TDE)** mode. Each background image was processed to:
 
