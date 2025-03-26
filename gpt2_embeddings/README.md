@@ -6,7 +6,8 @@ This directory contains pre-computed embeddings generated using the GPT-2 langua
 
 - `node_embeddings.npy`: Embeddings for object categories (768-dimensional vectors)
 - `edge_embeddings.npy`: Embeddings for spatial relationships (768-dimensional vectors)
-
+- `generate_embeddings.ipynb`: Jupyter notebook containing the code used to generate these embeddings
+ 
 ## Overview
 
 The embeddings in this directory provide rich semantic representations of objects and their relationships by leveraging the pre-trained knowledge of GPT-2. Unlike traditional categorical embeddings that simply assign an arbitrary vector to each class, these embeddings capture nuanced semantic information by encoding:
@@ -52,14 +53,14 @@ Some examples of object categories include:
 
 ## How These Embeddings Were Generated
 
-These embeddings were created using the following process:
+These embeddings were created using the process documented in `generate_embeddings.ipynb`:
 
-1. For each object category, detailed descriptions and placement contexts were defined
-2. For each relationship type, precise definitions were created
+1. For each object category, detailed descriptions and placement contexts were automatically generated using AI
+2. For each relationship type, precise definitions were similarly AI-generated to ensure comprehensive coverage
 3. The GPT-2 model was used to encode these textual descriptions into 768-dimensional vectors
 4. The resulting embeddings were saved in NumPy format for efficient loading
 
-Each object category was processed to create multiple semantic perspectives, and the relationship embeddings were generated to capture the precise nature of spatial and semantic interactions.
+Each object category was processed to create multiple semantic perspectives, with descriptions encompassing both definitional characteristics and typical spatial contexts. The relationship embeddings were generated to capture the precise nature of spatial and semantic interactions, ensuring consistency across the entire vocabulary.
 
 ## Usage in GraPLUS
 
