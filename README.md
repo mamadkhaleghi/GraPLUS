@@ -53,7 +53,7 @@ GraPLUS consists of four principal components:
 
 3. **Graph Transformer Network (GTN)**: Processes object-object interactions through edge-aware attention with a configurable number of heads and layers.
 
-4. **Cross-Attention Module**: Computes attention weights between foreground object category and scene features to identify optimal placement locations.
+4. **Cross-Attention Module (MHA)**: Computes attention weights between foreground object category and scene features to identify optimal placement locations.
 
 This semantic-first design enables contextually appropriate object placements with improved coherence and accuracy compared to pixel-based methods.
 
@@ -75,7 +75,7 @@ For more details, see [gpt2_embeddings/README.md](gpt2_embeddings/README.md).
 
 ## 🎯 Visual Comparisons
 
-Below are some visual comparisons between our method and previous approaches:
+Below are some visual comparisons between our method and previous GAN-based approaches:
 
 ![Visual Comparisons](images/visual_comparison.png)
 
@@ -90,9 +90,9 @@ We provide models for **TERSE** (CVPR 2019) [[arXiv]](https://arxiv.org/abs/1904
 | 0   | TERSE    | -          |   0.683  | 47.44  | 0.000  | [TERSE_checkpoint](https://drive.google.com/file/d/1xxxxxxxxxxxxx/view?usp=sharing) |
 | 1   | PlaceNet | -          |   0.684  | 37.63  | 0.160  | [PlaceNet_checkpoint](https://drive.google.com/file/d/1xxxxxxxxxxxxx/view?usp=sharing) |
 | 2   | GracoNet | 0.263 | 0.838 | 29.35 | 0.207 | [GracoNet_checkpoint](https://drive.google.com/file/d/1xxxxxxxxxxxxx/view?usp=sharing) |
-| 3   | CA-GAN   | -          |   0.734  | 25.54  | 0.267  | [CA-GAN_checkpoint](https://drive.google.com/file/d/1xxxxxxxxxxxxx/view?usp=sharing) |
-| 4   | CSANet   | 0.216 | 0.803 | 22.42 | 0.264 | [CSANet_checkpoint](https://drive.google.com/file/d/1xxxxxxxxxxxxx/view?usp=sharing) |
-| 5   | GraPLUS  | **0.521**  | **0.921**| 28.83  | 0.055  | [GraPLUS_checkpoint](https://drive.google.com/file/d/1xxxxxxxxxxxxx/view?usp=sharing) |
+| 3   | CA-GAN   | -          |   0.734  | 25.54  | **0.267**  | [CA-GAN_checkpoint](https://drive.google.com/file/d/1xxxxxxxxxxxxx/view?usp=sharing) |
+| 4   | CSANet   | 0.216 | 0.803 | **22.42** | 0.264 | [CSANet_checkpoint](https://drive.google.com/file/d/1xxxxxxxxxxxxx/view?usp=sharing) |
+| 5   | GraPLUS  | **0.521**  | **0.921**| 28.83  | 0.055  | [GraPLUS_checkpoint](https://drive.google.com/file/d/1owwkDvR6Tl9MKoIl50UI83wxc35dZ4ub/view?usp=sharing) |
 
 See the [GracoNet repository](https://github.com/bcmi/GracoNet-Object-Placement) and [CSANet repository](https://github.com/CodeGoat24/CSANet) for the original model implementations and checkpoints.
 
@@ -260,6 +260,17 @@ To generate composite images from a trained model:
 The output composite images will be saved in `result/YOUR_EXPERIMENT_NAME/eval/EPOCH_NUMBER/`.
 
 ## 📊 Evaluation
+### Required Pre-trained Models
+
+Before evaluation, you'll need these pre-trained models:
+
+1. **Binary Classifier**: We use the SimOPA binary classifier from the [OPA repository](https://github.com/bcmi/Object-Placement-Assessment-Dataset-OPA) to measure placement plausibility
+   - Download the pre-trained classifier from [BCMI Cloud](https://cloud.bcmi.sjtu.edu.cn/sharing/XPEgkSHdQ) or [Baidu Disk](https://pan.baidu.com/s/1skFRfLyczzXUpp-6tMHArA) (code: 0qty)
+   - Place the file as `BINARY_CLASSIFIER/best-acc.pth` in your project directory
+   
+2. **Faster R-CNN Model**: Required by the SimOPA classifier and originally provided by [Faster-RCNN-VG](https://github.com/shilrley6/Faster-R-CNN-with-model-pretrained-on-Visual-Genome)
+   - Download from [Google Drive](https://drive.google.com/file/d/18n_3V1rywgeADZ3oONO0DsuuS9eMW6sN/view)
+   - Place the file as `faster-rcnn/models/faster_rcnn_res101_vg.pth`
 
 ### All-in-One Evaluation
 To evaluate all metrics at once:
@@ -288,26 +299,26 @@ Results will be available at `result/YOUR_EXPERIMENT_NAME/*_resall.txt`.
 ### Quantitative Results
 Our model outperforms previous methods across multiple metrics:
 
-| Method   | User Study ↑| Accuracy ↑| FID    ↓| Mean IoU ↑| Center Dist. ↓| Scale Ratio ↑|
-|----------|------------|----------|--------|----------|--------------|-------------|
-| TERSE    | -          | 0.683    | 47.44  | 0.171    | 172.04       | 9.1%        |
-| PlaceNet | -          | 0.684    | 37.63  | 0.194    | 144.77       | 12.0%       |
-| GracoNet | 0.263      | 0.838    | 29.35  | 0.192    | 166.95       | 14.7%       |
-| CA-GAN   | -          | 0.734    | 25.54  | 0.165    | 190.37       | 12.5%       |
-| CSANet   | 0.216      | 0.803    | **22.42**  | 0.162    | 193.34       | 13.6%       |
-| GraPLUS  | **0.521**  | **0.921**| 28.83  | **0.203**| **141.77**   | **16.5%**   |
+| Method   | User Study ↑| Accuracy ↑| Mean IoU ↑| Center Dist. ↓| Scale Ratio ↑|
+|----------|------------|----------|----------|--------------|-------------|
+| TERSE    | -          | 0.683    | 0.171    | 172.04       | 9.1%        |
+| PlaceNet | -          | 0.684    | 0.194    | 144.77       | 12.0%       |
+| GracoNet | 0.263      | 0.838    | 0.192    | 166.95       | 14.7%       |
+| CA-GAN   | -          | 0.734    | 0.165    | 190.37       | 12.5%       |
+| CSANet   | 0.216      | 0.803    | 0.162    | 193.34       | 13.6%       |
+| GraPLUS  | **0.521**  | **0.921**| **0.203**| **141.77**   | **16.5%**   |
 
 ### Ablation Studies
 Our experiments validate key design choices:
 
-| Component           | Accuracy ↑| FID    ↓| LPIPS  ↑|
-|---------------------|----------|--------|--------|
-| Full Model          | **0.921**    | 28.83  | 0.055  |
-| No Spatial Features | 0.899    | **25.35**  | **0.070**  |
-| No Position Encoding| 0.812    | 31.70  | 0.054  |
-| No Residual Conn.   | 0.828    | 30.80  | 0.056  |
-| No Balanced Sampling| 0.873    | 29.14  | 0.053  |
-| No Data Augmentation| 0.842    | 32.60  | 0.039  |
+| Component                         | Accuracy ↑| FID    ↓| LPIPS  ↑|
+|-----------------------------------|----------|--------|--------|
+| Full Model                        | **0.921**    | 28.83  | 0.055  |
+| No Spatial Features on GTN output | 0.899    | **25.35**  | **0.070**  |
+| No Position Encoding in MHA       | 0.812    | 31.70  | 0.054  |
+| No Residual Connection in MHA     | 0.828    | 30.80  | 0.056  |
+| No Balanced Sampling              | 0.873    | 29.14  | 0.053  |
+| No Data Augmentation              | 0.842    | 32.60  | 0.039  |
 
 ## 🖊️ Citation
 If you find **GraPLUS** useful, please cite our paper:
