@@ -1,8 +1,5 @@
 import os
 import sys
-from thop import profile, clever_format
-
-
 
 # Get the current file's directory
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -12,7 +9,7 @@ main_dir = os.path.abspath(os.path.join(current_dir, "../../"))
 
 # Add this directory to sys.path
 sys.path.append(main_dir)
-##########################################################
+
 
 import argparse
 from tqdm import tqdm
@@ -24,12 +21,9 @@ from loader import get_sg_loader
 from loader.utils import gen_composite_image
 
 
-######
-OPA_path    = os.path.abspath(os.path.join(current_dir, "../../../OPA_dataset"))
-SG_OPA_path = os.path.abspath(os.path.join(current_dir, "../../../OPA_SG/"))
-
-
-gpt2_path = os.path.abspath(os.path.join(current_dir, "../../../word_embedding_checkpoints/gpt2"))
+OPA_path    = os.path.abspath(os.path.join(current_dir, "../../dataset/OPA/"))
+SG_OPA_path = os.path.abspath(os.path.join(current_dir, "../../dataset/OPA_SG/"))
+gpt2_path = os.path.abspath(os.path.join(current_dir, "../../gpt2_embeddings/"))
 
 
 ########################################################## Sampling
