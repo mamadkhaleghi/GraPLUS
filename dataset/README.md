@@ -155,14 +155,11 @@ If you use this scene graph dataset in your research, please cite ours and the o
   year={2025}
 }
 
-@misc{zellers2018neuralmotifsscenegraph,
-      title={Neural Motifs: Scene Graph Parsing with Global Context}, 
-      author={Rowan Zellers and Mark Yatskar and Sam Thomson and Yejin Choi},
-      year={2018},
-      eprint={1711.06640},
-      archivePrefix={arXiv},
-      primaryClass={cs.CV},
-      url={https://arxiv.org/abs/1711.06640}, 
+@article{liu2022opa,
+  title={OPA: Object Placement Assessment Dataset},
+  author={Liu, Liu and Liu, Zhenchen and Zhang, Bo and Li, Jiangtong and Niu, Li and Liu, Qingyang and Zhang, Liqing},
+  journal={arXiv preprint arXiv:2107.01889},
+  year={2022}
 }
 
 @misc{tang2020unbiasedscenegraphgeneration,
@@ -173,5 +170,14 @@ If you use this scene graph dataset in your research, please cite ours and the o
       archivePrefix={arXiv},
       primaryClass={cs.CV},
       url={https://arxiv.org/abs/2002.11949}, 
+}
+@misc{zellers2018neuralmotifsscenegraph,
+      title={Neural Motifs: Scene Graph Parsing with Global Context}, 
+      author={Rowan Zellers and Mark Yatskar and Sam Thomson and Yejin Choi},
+      year={2018},
+      eprint={1711.06640},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV},
+      url={https://arxiv.org/abs/1711.06640}, 
 }
 ```
