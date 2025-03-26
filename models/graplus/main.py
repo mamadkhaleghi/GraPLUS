@@ -5,11 +5,12 @@ import time
 # Get the current file's directory
 current_dir = os.path.dirname(os.path.abspath(__file__))
 
-# Move two levels up
+# # Move two levels up
 main_dir = os.path.abspath(os.path.join(current_dir, "../../"))
 
 # Add this directory to sys.path
 sys.path.append(main_dir)
+
 
 import argparse
 import torch
@@ -26,9 +27,9 @@ from model import GAN
 from infer import sample, infer
 
 
-OPA_path    = os.path.abspath(os.path.join(current_dir, "../../dataset/OPA/"))
-SG_OPA_path = os.path.abspath(os.path.join(current_dir, "../../dataset/OPA_SG/"))
-gpt2_path = os.path.abspath(os.path.join(current_dir, "../../gpt2_embeddings/"))
+# OPA_path    = os.path.abspath(os.path.join(current_dir, "../../dataset/OPA/"))
+# SG_OPA_path = os.path.abspath(os.path.join(current_dir, "../../dataset/OPA_SG/"))
+# gpt2_path = os.path.abspath(os.path.join(current_dir, "../../gpt2_embeddings/"))
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -38,8 +39,8 @@ def parse_args():
     parser.add_argument("--batch_size", type=int, default=64, help="size of the batches")
 
     parser.add_argument("--dst", type=str, choices=list(dataset_dict.keys()), default="SG_OPADst", help="dataloder type")
-    parser.add_argument("--data_root", type=str, default=OPA_path, help="dataset root")
-    parser.add_argument("--sg_root", type=str, default=SG_OPA_path, help="scene graph dataset root")
+    parser.add_argument("--data_root", type=str, default="OPA", help="dataset root")
+    parser.add_argument("--sg_root", type=str, default="OPA_SG", help="scene graph dataset root")
 
     parser.add_argument("--num_nodes", type=int, default=20, help="number of nodes in each scene graph")
     parser.add_argument("--img_size", type=int, default=32, help="size of image")
@@ -77,7 +78,7 @@ def parse_args():
     #------------------------------------ node/edge Embedding
     parser.add_argument("--embed_dim", type=int, default=768, help="node/edge embeding dimension")
     parser.add_argument("--embed_freeze", type=lambda x: x.lower() in ['true', '1', 't', 'y', 'yes'], default=True, help="to freeze the embedding layer or not")
-    parser.add_argument("--gpt2_path", type=str, default=gpt2_path, help="path for node/edge gpt2 embeddings ")
+    parser.add_argument("--gpt2_path", type=str, default="gpt2_embeddings", help="path for node/edge gpt2 embeddings ")
     parser.add_argument("--gpt2_node_mode", type=str, choices=['category_embedding', 'description_embedding', 'cat_desc_embedding', 'placement_embedding', 'cat_place_embedding', 'cat_desc_place_embedding'], default='cat_desc_place_embedding', help="Mode for selecting node embedding type")
 
     parser.add_argument("--use_spatial_info", type=lambda x: x.lower() in ['true', '1', 't', 'y', 'yes'], default=True, help="to concatenate spatial information on GTN output")
@@ -98,7 +99,7 @@ def parse_args():
     parser.add_argument("--add_residual", type=lambda x: x.lower() in ['true', '1', 't', 'y', 'yes'], default=True, help="to add residual in attention block")
     #---------------------------------------------------------------------------------------------------------------------#
 
-    parser.add_argument("--d_noise", type=int, default=2048, help="dimension of random noise/vector")
+    parser.add_argument("--d_noise", type=int, default=2048, help="vector dimension of random noise")
 
 
     opt = parser.parse_args()
