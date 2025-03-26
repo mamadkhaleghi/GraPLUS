@@ -16,7 +16,6 @@ else:
 
 class OPABasicDataset(Dataset):
     def __init__(self, size, mode_type, data_root):
-        # self.error_bar = 0.15
         self.size = size
         self.mode_type = mode_type
         self.data_root = data_root
