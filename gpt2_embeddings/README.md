@@ -64,7 +64,7 @@ Each object category was processed to create multiple semantic perspectives, wit
 
 ## Usage in GraPLUS
 
-The GraPLUS model loads these embeddings via the `GraphEmbeddings` class in `SG_Networks.py`, which:
+The GraPLUS model loads these embeddings via the `GraphEmbeddings` class in `models/graplus/SG_Networks.py`, which:
 
 1. Maps object categories and relationship types to their corresponding embeddings
 2. Makes these embeddings available to the Graph Transformer Network (GTN)
