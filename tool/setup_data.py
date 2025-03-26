@@ -101,7 +101,7 @@ def setup_scene_graphs(data_dir="dataset"):
 
 def main():
     parser = argparse.ArgumentParser(description="Setup datasets for GraPLUS")
-    parser.add_argument('--all', action='store_true', help='Setup all datasets and embeddings')
+    parser.add_argument('--all', action='store_true', help='Setup all datasets')
     parser.add_argument('--opa', action='store_true', help='Setup OPA dataset')
     parser.add_argument('--sg', action='store_true', help='Setup Scene Graph data')
     parser.add_argument('--data_dir', type=str, default="dataset", help='Base directory for datasets')
