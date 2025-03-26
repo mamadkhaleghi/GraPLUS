@@ -142,69 +142,7 @@ python tool/setup_data.py --all
 # python tool/setup_data.py --opa  # Only OPA dataset
 # python tool/setup_data.py --sg   # Only Scene Graphs
 ```
-Alternatively, you can follow the manual setup instructions for each dataset below:
-
-### OPA Dataset 
-1. Download and extract [OPA](https://github.com/bcmi/Object-Placement-Assessment-Dataset-OPA) dataset:
-   - [Google Drive](https://drive.google.com/file/d/133Wic_nSqfrIajDnnxwvGzjVti-7Y6PF/view?usp=sharing)
-   - [Baidu Disk](https://pan.baidu.com/s/1IzVLcXWLFgFR4GAbxZUPkw) (code: a982)
-
-2. Expected directory structure:
-```
-OPA_dataset/
-  background/       # background images
-  foreground/       # foreground images with masks
-  composite/        # composite images with masks
-  train_set.csv     # train annotation
-  test_set.csv      # test annotation
-```
-
-3. Preprocess the data and move it to your project directory:
-```bash
-python tool/preprocess.py --data_root /path/to/OPA_dataset
-mkdir -p dataset/OPA
-mv /path/to/OPA_dataset/* dataset/OPA/
-```
-
-4. After preprocessing, you'll have:
-```
-GraPLUS/
-  dataset/
-    OPA/
-      background/
-      foreground/
-      composite/
-      com_pic_testpos299/      # test set positive composite images (resized to 299)
-      train_data.csv           # transformed train annotation
-      train_data_pos.csv       # train annotation for positive samples
-      test_data.csv            # transformed test annotation
-      test_data_pos.csv        # test annotation for positive samples
-      test_data_pos_unique.csv # test annotation for positive samples with different fg/bg pairs
-```
-
-### OPA Scene Graph Dataset
-
-![Scene Graph Generation](images/sgg.png)
-
-As illustrated above, our approach uses scene graphs to represent background images, capturing object relationships and their interactions. Nodes represent objects, edges represent relationships, and each object has a corresponding bounding box detection.
-
-1. Download our pre-processed scene graph data:
-   - [Google Drive](https://drive.google.com/file/d/1xxxxxxxxxxxxx/view?usp=sharing)
-
-2. Extract and place the scene graph data in your project:
-```
-mkdir -p dataset/OPA_SG
-tar -xzf OPA_SG.tar.gz -C dataset/OPA_SG
-```
-3. The scene graph directory structure should be:
-```
-GraPLUS/
-  dataset/
-    OPA_SG/
-      sg_opa_background_n20/      # Scene graphs with 20 nodes for background images
-        <category>/               # Categories folders
-          sg_<image_id>.json      # Scene graph for each background image
-```
+For manual setup instructions for each dataset and more details about datasets, see [gpt2_embeddings/README.md](dataset/README.md).
 
 ## 💻 Training
 
@@ -296,7 +234,7 @@ Results will be available at `result/YOUR_EXPERIMENT_NAME/*_resall.txt`.
 ## 📈 Results
 
 ### Quantitative Results
-Our model outperforms previous methods across multiple metrics:
+Our model outperforms previous GAN-based methods across multiple metrics:
 
 | Method   | User Study ↑| Accuracy ↑| Mean IoU ↑| Center Dist. ↓| Scale Ratio ↑|
 |----------|------------|----------|----------|--------------|-------------|
