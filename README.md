@@ -106,7 +106,7 @@ pip install -r requirements.txt
 
 4. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/GraPLUS.git
+git clone https://github.com/mamadkhaleghi/GraPLUS.git
 cd GraPLUS
 ```
 
@@ -119,7 +119,7 @@ cd GraPLUS
 
 2. Expected directory structure:
 ```
-<PATH_TO_OPA>
+OPA_dataset/
   background/       # background images
   foreground/       # foreground images with masks
   composite/        # composite images with masks
@@ -127,20 +127,27 @@ cd GraPLUS
   test_set.csv      # test annotation
 ```
 
-3. Preprocess the data:
+3. Preprocess the data and move it to your project directory:
 ```bash
-python tool/preprocess.py --data_root <PATH_TO_OPA>
+python tool/preprocess.py --data_root /path/to/OPA_dataset
+mkdir -p dataset/OPA
+mv /path/to/OPA_dataset/* dataset/OPA/
 ```
 
 4. After preprocessing, you'll have:
 ```
-<PATH_TO_OPA>
-  com_pic_testpos299/          # test set positive composite images (resized to 299)
-  train_data.csv               # transformed train annotation
-  train_data_pos.csv           # train annotation for positive samples
-  test_data.csv                # transformed test annotation
-  test_data_pos.csv            # test annotation for positive samples
-  test_data_pos_unique.csv     # test annotation for positive samples with different fg/bg pairs 
+GraPLUS/
+  dataset/
+    OPA/
+      background/
+      foreground/
+      composite/
+      com_pic_testpos299/      # test set positive composite images (resized to 299)
+      train_data.csv           # transformed train annotation
+      train_data_pos.csv       # train annotation for positive samples
+      test_data.csv            # transformed test annotation
+      test_data_pos.csv        # test annotation for positive samples
+      test_data_pos_unique.csv # test annotation for positive samples with different fg/bg pairs
 ```
 
 ### OPA Scene Graph Dataset
