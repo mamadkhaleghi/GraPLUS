@@ -10,7 +10,6 @@ main_dir = os.path.abspath(os.path.join(current_dir, "../../"))
 
 # Add this directory to sys.path
 sys.path.append(main_dir)
-##########################################################
 
 import argparse
 import torch
@@ -22,15 +21,14 @@ with warnings.catch_warnings():
 from tool.utils import make_dirs, save, resume, make_logger, AverageMeter, save_loss_to_csv_1 , plot_from_csv, AccMeter
 from loader import dataset_dict, get_sg_loader, get_sg_dataset
 
-#####
+
 from model import GAN 
 from infer import sample, infer
 
-#####
-OPA_path    = os.path.abspath(os.path.join(current_dir, "../../../OPA_dataset"))
-SG_OPA_path = os.path.abspath(os.path.join(current_dir, "../../../OPA_SG/"))
-#####
-gpt2_path = os.path.abspath(os.path.join(current_dir, "../../../word_embedding_checkpoints/gpt2"))
+
+OPA_path    = os.path.abspath(os.path.join(current_dir, "../../dataset/OPA/"))
+SG_OPA_path = os.path.abspath(os.path.join(current_dir, "../../dataset/OPA_SG/"))
+gpt2_path = os.path.abspath(os.path.join(current_dir, "../../gpt2_embeddings/"))
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -51,7 +49,7 @@ def parse_args():
     parser.add_argument("--mode_type", type=str, choices=["train", "trainpos", "sample", "eval", "evaluni"], default="train", help="evaluation type")
     parser.add_argument("--with_infer", action='store_true', default=False, help="action to make inference after each training epoch")
     
-    parser.add_argument("--sample_interval", type=int, default=10, help="interval between image sampling")
+    parser.add_argument("--sample_interval", type=int, default=1000, help="interval between image sampling")
 
     #---------------------------------------------------------------------------------------------------------------------# sampling / data augmentation
     parser.add_argument("--sampler_type", type=str, choices=["default","balance_sampler","TwoToOne_sampler"], default="balance_sampler", help="type of dataset sampler")
