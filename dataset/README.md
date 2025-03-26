@@ -107,10 +107,10 @@ GraPLUS/
 
 4. Each JSON file contains:
 
-Nodes: Object instances detected in the background image
-Edges: Relationships between objects
-Bounding boxes: Spatial coordinates for each detected object
-Node and edge labels: Category information for objects and relationships
+- **Nodes**: Object instances detected in the background image
+- **Edges**: Relationships between objects
+- **Bounding boxes**: Spatial coordinates for each detected object
+- **Node and edge labels**: Category information for objects and relationships
 
 These scene graphs are generated using a pre-trained **Neural-MOTIFS** model operating in **Total Direct Effect (TDE)** mode.
 
