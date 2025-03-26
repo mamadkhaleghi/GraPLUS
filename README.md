@@ -254,7 +254,7 @@ Our model outperforms previous methods across multiple metrics:
 | PlaceNet | -          | 0.684    | 37.63  | 0.194    | 144.77       | 12.0%       |
 | GracoNet | 0.263      | 0.838    | 29.35  | 0.192    | 166.95       | 14.7%       |
 | CA-GAN   | -          | 0.734    | 25.54  | 0.165    | 190.37       | 12.5%       |
-| CSANet   | 0.216      | 0.803    | 22.42  | 0.162    | 193.34       | 13.6%       |
+| CSANet   | 0.216      | 0.803    | **22.42**  | 0.162    | 193.34       | 13.6%       |
 | GraPLUS  | **0.521**  | **0.921**| 28.83  | **0.203**| **141.77**   | **16.5%**   |
 
 ### Ablation Studies
@@ -262,8 +262,8 @@ Our experiments validate key design choices:
 
 | Component           | Accuracy | FID    | LPIPS  |
 |---------------------|----------|--------|--------|
-| Full Model          | 0.921    | 28.83  | 0.055  |
-| No Spatial Features | 0.899    | 25.35  | 0.070  |
+| Full Model          | **0.921**    | 28.83  | 0.055  |
+| No Spatial Features | 0.899    | **25.35**  | **0.070**  |
 | No Position Encoding| 0.812    | 31.70  | 0.054  |
 | No Residual Conn.   | 0.828    | 30.80  | 0.056  |
 | No Balanced Sampling| 0.873    | 29.14  | 0.053  |
