@@ -144,6 +144,11 @@ python tool/preprocess.py --data_root <PATH_TO_OPA>
 ```
 
 ### OPA Scene Graph Dataset
+
+![Scene Graph Generation](images/sgg.png)
+
+As illustrated above, our approach uses scene graphs to represent background images, capturing object relationships and their interactions. Nodes represent objects, edges represent relationships, and each object has a corresponding bounding box detection.
+
 1. Download our pre-processed scene graph data:
    - [Google Drive](https://drive.google.com/file/d/1xxxxxxxxxxxxx/view?usp=sharing)
 
