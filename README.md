@@ -57,9 +57,25 @@ GraPLUS consists of four principal components:
 
 This semantic-first design enables contextually appropriate object placements with improved coherence and accuracy compared to pixel-based methods.
 
+## 🧠 GPT-2 Semantic Embeddings
+
+A key innovation in GraPLUS is our use of rich semantic embeddings generated using GPT-2. Unlike traditional categorical embeddings, these representations capture nuanced semantic information about objects and their relationships:
+
+- **Node Embeddings**: 768-dimensional vectors for 169 object categories that encode both definitional characteristics and typical spatial contexts
+- **Edge Embeddings**: 768-dimensional vectors for 51 relationship types that define how objects interact spatially and semantically
+
+These embeddings enable the model to understand that a "chair" is not just a categorical label, but a piece of furniture typically found at tables, desks, or in grouped arrangements - substantially improving placement decisions.
+
+The `gpt2_embeddings/` directory contains:
+- Pre-computed embeddings for efficient model training and inference
+- A Jupyter notebook (`generate_embeddings.ipynb`) documenting the embedding generation process
+- Detailed documentation of the embedding methodology
+
+For more details, see [gpt2_embeddings/README.md](gpt2_embeddings/README.md).
+
 ## 🎯 Visual Comparisons
 
-Below are some visual comparisons between our method and previous state-of-the-art approaches:
+Below are some visual comparisons between our method and previous approaches:
 
 ![Visual Comparisons](images/visual_comparison.png)
 
@@ -71,12 +87,14 @@ We provide models for **TERSE** (CVPR 2019) [[arXiv]](https://arxiv.org/abs/1904
 
 |     | Method   | User Study ↑ | Accuracy ↑ | FID ↓   | LPIPS ↑ | Model & Logs |
 |-----|----------|------------|----------|--------|--------|---------------------|
-| 0   | TERSE    | -          |   0.683  | 47.44  | 0.000  | [Google Drive](https://drive.google.com/file/d/1xxxxxxxxxxxxx/view?usp=sharing) |
-| 1   | PlaceNet | -          |   0.684  | 37.63  | 0.160  | [Google Drive](https://drive.google.com/file/d/1xxxxxxxxxxxxx/view?usp=sharing) |
-| 2   | [GracoNet](https://github.com/bcmi/GracoNet-Object-Placement) | 0.263 | 0.838 | 29.35 | 0.207 | [Google Drive](https://drive.google.com/file/d/1xxxxxxxxxxxxx/view?usp=sharing) |
-| 3   | CA-GAN   | -          |   0.734  | 25.54  | 0.267  | [Google Drive](https://drive.google.com/file/d/1xxxxxxxxxxxxx/view?usp=sharing) |
-| 4   | [CSANet](https://github.com/CodeGoat24/CSANet) | 0.216 | 0.803 | 22.42 | 0.264 | [Google Drive](https://drive.google.com/file/d/1xxxxxxxxxxxxx/view?usp=sharing) |
-| 5   | GraPLUS  | **0.521**  | **0.921**| 28.83  | 0.055  | [Google Drive](https://drive.google.com/file/d/1xxxxxxxxxxxxx/view?usp=sharing) |
+| 0   | TERSE    | -          |   0.683  | 47.44  | 0.000  | [TERSE_checkpoint](https://drive.google.com/file/d/1xxxxxxxxxxxxx/view?usp=sharing) |
+| 1   | PlaceNet | -          |   0.684  | 37.63  | 0.160  | [PlaceNet_checkpoint](https://drive.google.com/file/d/1xxxxxxxxxxxxx/view?usp=sharing) |
+| 2   | GracoNet | 0.263 | 0.838 | 29.35 | 0.207 | [GracoNet_checkpoint](https://drive.google.com/file/d/1xxxxxxxxxxxxx/view?usp=sharing) |
+| 3   | CA-GAN   | -          |   0.734  | 25.54  | 0.267  | [CA-GAN_checkpoint](https://drive.google.com/file/d/1xxxxxxxxxxxxx/view?usp=sharing) |
+| 4   | CSANet   | 0.216 | 0.803 | 22.42 | 0.264 | [CSANet_checkpoint](https://drive.google.com/file/d/1xxxxxxxxxxxxx/view?usp=sharing) |
+| 5   | GraPLUS  | **0.521**  | **0.921**| 28.83  | 0.055  | [GraPLUS_checkpoint](https://drive.google.com/file/d/1xxxxxxxxxxxxx/view?usp=sharing) |
+
+See the [GracoNet repository](https://github.com/bcmi/GracoNet-Object-Placement) and [CSANet repository](https://github.com/CodeGoat24/CSANet) for the original model implementations and checkpoints.
 
 ## 🔧 Environment Setup
 
@@ -189,17 +207,6 @@ GraPLUS/
           sg_<image_id>.json      # Scene graph for each background image
 ```
 
-### GPT-2 Embeddings
-1. Download our pre-computed GPT-2 embeddings:
-   - [Google Drive](https://drive.google.com/file/d/1xxxxxxxxxxxxx/view?usp=sharing)
-
-2. Extract to the `gpt2_embeddings` directory in your project:
-```
-gpt2_embeddings/
-  node_embeddings.npy         # GPT-2 embeddings for object nodes
-  edge_embeddings.npy         # GPT-2 embeddings for relation edges
-```
-
 ## 💻 Training
 
 ### Basic Training
@@ -281,7 +288,7 @@ Results will be available at `result/YOUR_EXPERIMENT_NAME/*_resall.txt`.
 ### Quantitative Results
 Our model outperforms previous methods across multiple metrics:
 
-| Method   | User Study | Accuracy | FID    | Mean IoU | Center Dist. | Scale Ratio |
+| Method   | User Study ↑| Accuracy ↑| FID    ↓| Mean IoU ↑| Center Dist. ↓| Scale Ratio ↑|
 |----------|------------|----------|--------|----------|--------------|-------------|
 | TERSE    | -          | 0.683    | 47.44  | 0.171    | 172.04       | 9.1%        |
 | PlaceNet | -          | 0.684    | 37.63  | 0.194    | 144.77       | 12.0%       |
@@ -293,7 +300,7 @@ Our model outperforms previous methods across multiple metrics:
 ### Ablation Studies
 Our experiments validate key design choices:
 
-| Component           | Accuracy | FID    | LPIPS  |
+| Component           | Accuracy ↑| FID    ↓| LPIPS  ↑|
 |---------------------|----------|--------|--------|
 | Full Model          | **0.921**    | 28.83  | 0.055  |
 | No Spatial Features | 0.899    | **25.35**  | **0.070**  |
