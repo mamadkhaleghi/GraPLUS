@@ -112,6 +112,22 @@ cd GraPLUS
 
 ## 🌓 Data Preparation
 
+You can download and set up all required data automatically using our setup script:
+
+```bash
+# Install required packages
+pip install gdown
+
+# Setup all datasets (OPA dataset, Scene Graphs, and GPT-2 embeddings)
+python tool/setup_data.py --all
+
+# Or selectively setup only what you need:
+# python tool/setup_data.py --opa  # Only OPA dataset
+# python tool/setup_data.py --sg   # Only Scene Graphs
+# python tool/setup_data.py --gpt2 # Only GPT-2 embeddings
+```
+Alternatively, you can follow the manual setup instructions for each dataset below:
+
 ### OPA Dataset 
 1. Download and extract [OPA](https://github.com/bcmi/Object-Placement-Assessment-Dataset-OPA) dataset:
    - [Google Drive](https://drive.google.com/file/d/133Wic_nSqfrIajDnnxwvGzjVti-7Y6PF/view?usp=sharing)
@@ -159,13 +175,19 @@ As illustrated above, our approach uses scene graphs to represent background ima
 1. Download our pre-processed scene graph data:
    - [Google Drive](https://drive.google.com/file/d/1xxxxxxxxxxxxx/view?usp=sharing)
 
-2. Extract the dataset to your designated scene graph directory (e.g., `<PATH_TO_SG_OPA>`). The structure should be:
+2. Extract and place the scene graph data in your project:
 ```
-<PATH_TO_SG_OPA>
-  csg_background_20/          # Scene graphs with 20 nodes for background images
-    <category>/                # Categories folders
-      sg_<image_id>.json      # Scene graph for each background image
-  ...
+mkdir -p dataset/OPA_SG
+tar -xzf OPA_SG.tar.gz -C dataset/OPA_SG
+```
+3. The scene graph directory structure should be:
+```
+GraPLUS/
+  dataset/
+    OPA_SG/
+      sg_opa_background_n20/      # Scene graphs with 20 nodes for background images
+        <category>/               # Categories folders
+          sg_<image_id>.json      # Scene graph for each background image
 ```
 
 ### GPT-2 Embeddings
