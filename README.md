@@ -1,7 +1,6 @@
 # GraPLUS: Graph-based Placement Using Semantics for Image Composition
 
 [![arXiv](https://img.shields.io/badge/arXiv-2503.15761-b31b1b.svg)](https://arxiv.org/abs/2503.15761)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.6](https://img.shields.io/badge/python-3.6-blue.svg)](https://www.python.org/downloads/release/python-360/)
 [![PyTorch 1.9.1](https://img.shields.io/badge/pytorch-1.9.1-orange.svg)](https://pytorch.org/get-started/previous-versions/)
 
@@ -118,7 +117,7 @@ You can download and set up all required data automatically using our setup scri
 # Install required packages
 pip install gdown
 
-# Setup all datasets (OPA dataset, Scene Graphs, and GPT-2 embeddings)
+# Setup all required data (OPA dataset, Scene Graphs, and GPT-2 embeddings)
 python tool/setup_data.py --all
 
 # Or selectively setup only what you need:
@@ -321,6 +320,7 @@ Our codebase builds upon several excellent works:
 - [CSANet](https://github.com/CodeGoat24/CSANet)
 
 Additional components are borrowed and modified from:
+- [Scene-Graph-Benchmark](https://github.com/KaihuaTang/Scene-Graph-Benchmark.pytorch)
 - [Faster-RCNN-VG](https://github.com/shilrley6/Faster-R-CNN-with-model-pretrained-on-Visual-Genome)
 - [OPA Dataset](https://github.com/bcmi/Object-Placement-Assessment-Dataset-OPA)
 - [FID-Pytorch](https://github.com/mseitzer/pytorch-fid)
@@ -331,6 +331,3 @@ If you have any technical questions or suggestions, please open a new issue or f
 
 - Mir Mohammad Khaleghi (m.khaleghi@ec.iut.ac.ir, mamadkhaleghi1994@gmail.com)
 - Mehran Safayani (safayani@iut.ac.ir) - Corresponding author
-
-## 📄 License
-This project is released under the MIT License.
