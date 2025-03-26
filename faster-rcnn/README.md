@@ -11,7 +11,7 @@ The Faster R-CNN model pre-trained on Visual Genome provides powerful object det
 
 ## Model Setup
 
-1. Download the pre-trained model from Google Drive
+1. Download the pre-trained model from [google drive](https://drive.google.com/file/d/18n_3V1rywgeADZ3oONO0DsuuS9eMW6sN/view)
 2. Place the downloaded file in this directory as:`/faster-rcnn/models/faster_rcnn_res101_vg.pth`
 
 ## Usage in GraPLUS
@@ -30,7 +30,7 @@ This model is essential for the evaluation process in GraPLUS:
 
 ## Acknowledgements
 
-This component is adapted and modified from Faster-RCNN-VG. We thank the original authors for making their implementation and pre-trained models publicly available.
+This component is adapted and modified from [Faster-RCNN-VG](https://github.com/shilrley6/Faster-R-CNN-with-model-pretrained-on-Visual-Genome). We thank the original authors for making their implementation and pre-trained models publicly available.
 
 ## Related Components
 
