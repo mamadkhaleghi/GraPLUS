@@ -21,3 +21,14 @@ This classifier requires the Faster R-CNN model pre-trained on Visual Genome:
 
 1. Download from [Google Drive](https://drive.google.com/file/d/18n_3V1rywgeADZ3oONO0DsuuS9eMW6sN/view)
 2. Place the file in `faster-rcnn/models/faster_rcnn_res101_vg.pth`
+
+## Citation
+If you use this model in your research, please cite the original OPA dataset paper:
+```bibtex
+@article{liu2022opa,
+  title={OPA: Object Placement Assessment Dataset},
+  author={Liu, Liu and Liu, Zhenchen and Zhang, Bo and Li, Jiangtong and Niu, Li and Liu, Qingyang and Zhang, Liqing},
+  journal={arXiv preprint arXiv:2107.01889},
+  year={2022}
+}
+```
