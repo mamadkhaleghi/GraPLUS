@@ -87,12 +87,12 @@ We provide models for **TERSE** (CVPR 2019) [[arXiv]](https://arxiv.org/abs/1904
 
 |     | Method   | User Study ↑ | Accuracy ↑ | FID ↓   | LPIPS ↑ | Model & Logs |
 |-----|----------|------------|----------|--------|--------|---------------------|
-| 0   | TERSE    | -          |   0.683  | 47.44  | 0.000  | [TERSE_checkpoint](https://drive.google.com/file/d/1xxxxxxxxxxxxx/view?usp=sharing) |
-| 1   | PlaceNet | -          |   0.684  | 37.63  | 0.160  | [PlaceNet_checkpoint](https://drive.google.com/file/d/1xxxxxxxxxxxxx/view?usp=sharing) |
-| 2   | GracoNet | 0.263 | 0.838 | 29.35 | 0.207 | [GracoNet_checkpoint](https://drive.google.com/file/d/1xxxxxxxxxxxxx/view?usp=sharing) |
-| 3   | CA-GAN   | -          |   0.734  | 25.54  | **0.267**  | [CA-GAN_checkpoint](https://drive.google.com/file/d/1xxxxxxxxxxxxx/view?usp=sharing) |
-| 4   | CSANet   | 0.216 | 0.803 | **22.42** | 0.264 | [CSANet_checkpoint](https://drive.google.com/file/d/1xxxxxxxxxxxxx/view?usp=sharing) |
-| 5   | GraPLUS  | **0.521**  | **0.921**| 28.83  | 0.055  | [GraPLUS_checkpoint](https://drive.google.com/file/d/1owwkDvR6Tl9MKoIl50UI83wxc35dZ4ub/view?usp=sharing) |
+| 0   | TERSE    | -          |   0.683  | 47.44  | 0.000  | [TERSE_checkpoint](https://drive.google.com/file/d/1L2R4J7nMoNhtg5a0dnGSVpLmxJCVXM3s/view?usp=sharing) |
+| 1   | PlaceNet | -          |   0.684  | 37.63  | 0.160  | [PlaceNet_checkpoint](https://drive.google.com/file/d/1TDyLUt4Xc2anGVQZZYlvTmlayKCq4Mzx/view?usp=sharing) |
+| 2   | GracoNet | 0.263 | 0.838 | 29.35 | 0.207 | [GracoNet_checkpoint](https://drive.google.com/file/d/1LQEb3nX5oTd8RR1uEcA99SKC6u6fyiGS/view?usp=sharing) |
+| 3   | CA-GAN   | -          |   0.734  | 25.54  | **0.267**  | [CA-GAN_checkpoint](https://drive.google.com/file/d/1fF9EG5TXX_mMMhF3Nz5qBTwbqQ8M-4wI/view?usp=sharing) |
+| 4   | CSANet   | 0.216 | 0.803 | **22.42** | 0.264 | [CSANet_checkpoint](https://drive.google.com/file/d/1me7Ua67Pnwl9entWXgFRTP_ZyvAfWhJu/view?usp=sharing) |
+| 5   | GraPLUS  | **0.521**  | **0.921**| 28.83  | 0.055  | [GraPLUS_checkpoint](https://drive.google.com/file/d/1TDyLUt4Xc2anGVQZZYlvTmlayKCq4Mzx/view?usp=sharing) |
 
 See the [GracoNet repository](https://github.com/bcmi/GracoNet-Object-Placement) and [CSANet repository](https://github.com/CodeGoat24/CSANet) for the original model implementations and checkpoints.
 
@@ -142,20 +142,16 @@ python tool/setup_data.py --all
 # python tool/setup_data.py --opa  # Only OPA dataset
 # python tool/setup_data.py --sg   # Only Scene Graphs
 ```
-For manual setup instructions for each dataset and more details about datasets, see [gpt2_embeddings/README.md](dataset/README.md).
+For manual setup instructions of each dataset and more details about datasets, see [gpt2_embeddings/README.md](dataset/README.md).
 
 ## 💻 Training
-
 ### Basic Training
 To train GraPLUS with default settings:
-
 ```bash
-./train.sh graplus YOUR_EXPERIMENT_NAME --data_root <PATH_TO_OPA> --sg_root <PATH_TO_SG_OPA> --gpt2_path gpt2_embeddings
+./train.sh graplus YOUR_EXPERIMENT_NAME 
 ```
-
 ### Advanced Training Options
 You can customize various parameters:
-
 ```bash
 ./train.sh graplus YOUR_EXPERIMENT_NAME \
   --batch_size 64 \
@@ -170,31 +166,48 @@ You can customize various parameters:
   --sampler_type "balance_sampler"
 ```
 
+To train other models, simply replace `graplus` with the name of the model you want to train (model names correspond to subdirectories in the `models` directory, such as `cagan`, `csanet`, `graconet`, `placenet`, or `terse`):
+```bash
+./train.sh MODEL_NAME YOUR_EXPERIMENT_NAME 
+```
+Training files will be saved to `result/YOUR_EXPERIMENT_NAME/`.
+
 ### Training Monitoring
 To monitor the training progress:
-
 ```bash
 tensorboard --logdir result/YOUR_EXPERIMENT_NAME/tblog --port YOUR_SPECIFIED_PORT
 ```
 
 ## 🔥 Inference
-
 To generate composite images from a trained model:
-
 ```bash
-./infer.sh YOUR_EXPERIMENT_NAME --epoch EPOCH_NUMBER --eval_type eval --data_root <PATH_TO_OPA> --sg_root <PATH_TO_SG_OPA> --gpt2_path gpt2_embeddings
+./infer.sh eval graplus YOUR_EXPERIMENT_NAME EPOCH_NUMBER 
 ```
+or
+```bash
+./infer.sh evaluni graplus YOUR_EXPERIMENT_NAME EPOCH_NUMBER 
+```
+To infer other models, simply replace `graplus` with the name of the model you want to train (model names correspond to subdirectories in the `models` directory, such as `cagan`, `csanet`, `graconet`, `placenet`, or `terse`):
+```bash
+./infer.sh eval MODEL_NAME YOUR_EXPERIMENT_NAME EPOCH_NUMBER
+./infer.sh evaluni MODEL_NAME YOUR_EXPERIMENT_NAME  EPOCH_NUMBER
+```
+The output files of inference will be saved in `result/MODEL_NAME/eval/EPOCH_NUMBER` and `result/MODEL_NAME/evaluni/EPOCH_NUMBER` respectively.
 
-### Using Pre-trained Models
-
+## Inference Using Pre-trained Models
 1. Download the model from the provided link above
 2. Extract it to the `result/` directory
 3. Run:
 ```bash
-./infer.sh YOUR_EXPERIMENT_NAME --epoch EPOCH_NUMBER --eval_type eval --data_root <PATH_TO_OPA> --sg_root <PATH_TO_SG_OPA> --gpt2_path gpt2_embeddings
+./infer_checkpoint.sh eval MODEL_NAME
 ```
+or 
+```bash
+./infer_checkpoint.sh evaluni MODEL_NAME
+```
+The output files will be saved in `result/MODEL_NAME/eval/` and `result/MODEL_NAME/evaluni/` respectively.
+model names correspond to subdirectories in the `models` directory, such as `graplus`, `cagan`, `csanet`, `graconet`, `placenet`, or `terse`):
 
-The output composite images will be saved in `result/YOUR_EXPERIMENT_NAME/eval/EPOCH_NUMBER/`.
 
 ## 📊 Evaluation
 ### Required Pre-trained Models
