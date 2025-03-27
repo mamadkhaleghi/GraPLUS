@@ -11,7 +11,7 @@ fi
 EVAL_TYPE="$1"
 MODEL_NAME="$2"
 
-# Automatically set the checkpoint epoch based on model name
+# Automatically set the epoch based on model name
 case "$MODEL_NAME" in
     "graplus")
         EPOCH=21
@@ -39,7 +39,7 @@ case "$MODEL_NAME" in
         ;;
 esac
 
-echo "Using $MODEL_NAME checkpoint (epoch $EPOCH) for $EVAL_TYPE evaluation"
+echo "Using $MODEL_NAME checkpoint (epoch $EPOCH) for $EVAL_TYPE inference"
 
 # Get the absolute path to the main project directory
 PROJECT_ROOT="$(pwd)"
@@ -128,10 +128,13 @@ else
 fi
 
 # Print the command for visibility
-echo "###########################################################"
-echo "Executing command:"
+echo "########################################################### Executing command:"
 echo "$CMD"
-echo "cd "$PROJECT_ROOT""
+echo "cd \"$PROJECT_ROOT\""
+echo "########################################################### Generated files will be saved to:"
+echo " - composite images:    $PROJECT_ROOT/result/$MODEL_NAME/$EVAL_TYPE/$EPOCH/images/*.jpg"
+echo " - foreground masks:    $PROJECT_ROOT/result/$MODEL_NAME/$EVAL_TYPE/$EPOCH/masks/*.png"
+echo " - informed csv file :  $PROJECT_ROOT/result/$MODEL_NAME/$EVAL_TYPE/$EPOCH/$EVAL_TYPE.csv"
 echo "###########################################################"
 echo ""
 
