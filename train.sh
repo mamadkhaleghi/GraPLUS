@@ -16,7 +16,9 @@ shift 2  # Remove first two arguments (model_name and expid) from $@
 PROJECT_ROOT="$(pwd)"
 
 # Get absolute path to dataset
-DATASET_PATH="$PROJECT_ROOT/dataset/OPA"
+OPA_PATH="$PROJECT_ROOT/dataset/OPA"
+SG_PATH="$PROJECT_ROOT/dataset/OPA_SG"
+GPT2_PATH="$PROJECT_ROOT/gpt2_embeddings"
 
 # Check if model directory exists
 if [ ! -d "models/$MODEL_NAME" ]; then
@@ -24,11 +26,69 @@ if [ ! -d "models/$MODEL_NAME" ]; then
     exit 1
 fi
 
-# Check if dataset directory exists
+# Check if base dataset directory exists
 if [ ! -d "dataset/OPA" ]; then
     echo "Error: Dataset directory 'dataset/OPA' does not exist"
     exit 1
 fi
+
+# Additional checks for GraPLUS-specific directories
+if [ "$MODEL_NAME" = "graplus" ]; then
+    # Check for scene graph directory
+    if [ ! -d "dataset/OPA_SG" ]; then
+        echo "Error: Scene graph directory 'dataset/OPA_SG' does not exist"
+        echo "This directory is required for GraPLUS model"
+        exit 1
+    fi
+    
+    # Check for GPT-2 embeddings directory
+    if [ ! -d "gpt2_embeddings" ]; then
+        echo "Error: GPT-2 embeddings directory 'gpt2_embeddings' does not exist"
+        echo "This directory is required for GraPLUS model"
+        exit 1
+    fi
+fi
+
+# Build and display the command before execution
+if [ "$MODEL_NAME" = "graplus" ]; then
+    # Special case for graplus model with additional required paths
+    CMD="cd models/$MODEL_NAME && python main.py \\
+    --expid \"$EXPID\" \\
+    --data_root \"$OPA_PATH\" \\
+    --sg_root \"$SG_PATH\" \\
+    --gpt2_path \"$GPT2_PATH\""
+    
+    # Add any additional arguments
+    for arg in "$@"; do
+        CMD+=" \\
+    $arg"
+    done
+else
+    # Standard case for other models
+    CMD="cd models/$MODEL_NAME && python main.py \\
+    --expid \"$EXPID\" \\
+    --data_root \"$OPA_PATH\""
+    
+    # Add any additional arguments
+    for arg in "$@"; do
+        CMD+=" \\
+    $arg"
+    done
+fi
+
+# Print the command for visibility
+echo "########################################################### Executing command:"
+echo "$CMD"
+echo "cd \"$PROJECT_ROOT\""
+echo ""
+echo "########################################################### Training files will be saved to:"
+echo ""
+echo " - Model checkpoints: $PROJECT_ROOT/result/$EXPID/models/*.pth"
+echo " - Log file:          $PROJECT_ROOT/result/$EXPID/"
+echo " - sample files:      $PROJECT_ROOT/result/$EXPID/sample/"
+echo " - TensorBoard:       $PROJECT_ROOT/result/$EXPID/tblog/"
+echo "###########################################################"
+echo ""
 
 # Change to the specific model directory
 cd "models/$MODEL_NAME" || {
@@ -36,11 +96,22 @@ cd "models/$MODEL_NAME" || {
     exit 1
 }
 
-# Run the training script with all provided arguments
-python main.py \
-    --expid "$EXPID" \
-    --data_root "$DATASET_PATH" \
-    "$@"
+# Run the training script with model-specific arguments
+if [ "$MODEL_NAME" = "graplus" ]; then
+    # Special case for graplus model with additional required paths
+    python main.py \
+        --expid "$EXPID" \
+        --data_root "$OPA_PATH" \
+        --sg_root "$SG_PATH" \
+        --gpt2_path "$GPT2_PATH" \
+        "$@"
+else
+    # Standard case for other models
+    python main.py \
+        --expid "$EXPID" \
+        --data_root "$OPA_PATH" \
+        "$@"
+fi
 
 # Return to original directory
 cd "$PROJECT_ROOT"
