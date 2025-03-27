@@ -1,10 +1,14 @@
 import os
 import logging
 import datetime
+from PIL import Image
 import torch
+
+#####
 import csv
 import pandas as pd
 import matplotlib.pyplot as plt
+import re
 
 class AccMeter():
     '''Computes and stores the correctness of the discriminator prediction'''
@@ -484,7 +488,6 @@ def save_loss_to_csv_1(file_path, epoch, batch,
                           dst_corr_num_real,dst_tot_num_real, dst_avg_real,
                           dst_corr_num_fake,dst_tot_num_fake, dst_avg_fake])
 
-
 ###################################################################        
 def save_loss_to_csv_placenet(file_path, epoch, batch, g_gan_loss, g_ndiv_loss, d_real_loss, d_fake_loss):
     # Check if the file already exists
@@ -506,4 +509,41 @@ def save_loss_to_csv_placenet(file_path, epoch, batch, g_gan_loss, g_ndiv_loss, 
         # Write the data row
         writer.writerow([epoch, batch, g_gan_loss, g_ndiv_loss, d_real_loss, d_fake_loss])
 
-        
+
+################################################################### 
+def save_loss_to_csv_terse(file_path, epoch, batch, g_gan_loss, d_real_loss, d_fake_loss=None):
+    # Check if the file already exists
+    file_exists = os.path.isfile(file_path)
+    
+    if d_fake_loss != None : 
+        # Format the loss values to 3 decimal places
+        g_gan_loss = f"{g_gan_loss:.3f}"
+        d_real_loss = f"{d_real_loss:.3f}"
+        d_fake_loss  = f"{d_fake_loss:.3f}"
+
+
+        with open(file_path, mode='a', newline='') as file:
+            writer = csv.writer(file)
+            
+            # If the file does not exist, write the header
+            if not file_exists:
+                writer.writerow(['Epoch', 'Batch', 'G_GAN_Loss','D_Real_Loss', 'D_Fake_Loss'])
+            
+            # Write the data row
+            writer.writerow([epoch, batch, g_gan_loss, d_real_loss, d_fake_loss  ])
+
+    #---------------------------------------------------#
+    else:
+        # Format the loss values to 3 decimal places
+        g_gan_loss = f"{g_gan_loss:.3f}"
+        d_real_loss = f"{d_real_loss:.3f}"
+
+        with open(file_path, mode='a', newline='') as file:
+            writer = csv.writer(file)
+            
+            # If the file does not exist, write the header
+            if not file_exists:
+                writer.writerow(['Epoch', 'Batch', 'G_Loss','D_Loss',])
+            
+            # Write the data row
+            writer.writerow([epoch, batch, g_gan_loss, d_real_loss  ])
