@@ -87,12 +87,12 @@ We provide models for **TERSE** (CVPR 2019) [[arXiv]](https://arxiv.org/abs/1904
 
 |     | Method   | User Study ↑ | Accuracy ↑ | FID ↓   | LPIPS ↑ | Model & Logs |
 |-----|----------|------------|----------|--------|--------|---------------------|
-| 0   | TERSE    | -          |   0.683  | 47.44  | 0.000  | [TERSE_checkpoint](https://drive.google.com/file/d/1L2R4J7nMoNhtg5a0dnGSVpLmxJCVXM3s/view?usp=sharing) |
-| 1   | PlaceNet | -          |   0.684  | 37.63  | 0.160  | [PlaceNet_checkpoint](https://drive.google.com/file/d/1TDyLUt4Xc2anGVQZZYlvTmlayKCq4Mzx/view?usp=sharing) |
-| 2   | GracoNet | 0.263 | 0.838 | 29.35 | 0.207 | [GracoNet_checkpoint](https://drive.google.com/file/d/1LQEb3nX5oTd8RR1uEcA99SKC6u6fyiGS/view?usp=sharing) |
-| 3   | CA-GAN   | -          |   0.734  | 25.54  | **0.267**  | [CA-GAN_checkpoint](https://drive.google.com/file/d/1fF9EG5TXX_mMMhF3Nz5qBTwbqQ8M-4wI/view?usp=sharing) |
-| 4   | CSANet   | 0.216 | 0.803 | **22.42** | 0.264 | [CSANet_checkpoint](https://drive.google.com/file/d/1me7Ua67Pnwl9entWXgFRTP_ZyvAfWhJu/view?usp=sharing) |
-| 5   | GraPLUS  | **0.521**  | **0.921**| 28.83  | 0.055  | [GraPLUS_checkpoint](https://drive.google.com/file/d/1TDyLUt4Xc2anGVQZZYlvTmlayKCq4Mzx/view?usp=sharing) |
+| 0   | TERSE    | -          |   0.683  | 47.44  | 0.000  | [Google_Drive](https://drive.google.com/file/d/1L2R4J7nMoNhtg5a0dnGSVpLmxJCVXM3s/view?usp=sharing) |
+| 1   | PlaceNet | -          |   0.684  | 37.63  | 0.160  | [Google_Drive](https://drive.google.com/file/d/1TDyLUt4Xc2anGVQZZYlvTmlayKCq4Mzx/view?usp=sharing) |
+| 2   | GracoNet | 0.263 | 0.838 | 29.35 | 0.207 | [Google_Drive](https://drive.google.com/file/d/1LQEb3nX5oTd8RR1uEcA99SKC6u6fyiGS/view?usp=sharing) |
+| 3   | CA-GAN   | -          |   0.734  | 25.54  | **0.267**  | [Google_Drive](https://drive.google.com/file/d/1fF9EG5TXX_mMMhF3Nz5qBTwbqQ8M-4wI/view?usp=sharing) |
+| 4   | CSANet   | 0.216 | 0.803 | **22.42** | 0.264 | [Google_Drive](https://drive.google.com/file/d/1me7Ua67Pnwl9entWXgFRTP_ZyvAfWhJu/view?usp=sharing) |
+| 5   | GraPLUS  | **0.521**  | **0.921**| 28.83  | 0.055  | [Google_Drive](https://drive.google.com/file/d/1TDyLUt4Xc2anGVQZZYlvTmlayKCq4Mzx/view?usp=sharing) |
 
 See the [GracoNet repository](https://github.com/bcmi/GracoNet-Object-Placement) and [CSANet repository](https://github.com/CodeGoat24/CSANet) for the original model implementations and checkpoints.
 
@@ -124,25 +124,32 @@ pip install -r requirements.txt
 4. Clone the repository:
 ```bash
 git clone https://github.com/mamadkhaleghi/GraPLUS.git
-cd GraPLUS
+cd GraPLUS-main
 ```
 
 ## 🌓 Data Preparation
+GraPLUS requires two datasets:
 
-You can download and set up all required data automatically using our setup script:
+**OPA Dataset**: Object Placement Assessment dataset with background/foreground images
+**Scene Graph Data**: Pre-processed graph representations of OPA background images
+
+### OPA Dataset
+
+Download and extract the OPA dataset from [Google Drive](https://drive.google.com/file/d/133Wic_nSqfrIajDnnxwvGzjVti-7Y6PF/view?usp=sharing) or [Baidu Disk](https://pan.baidu.com/s/1IzVLcXWLFgFR4GAbxZUPkw) (code: a982) and put it to `dataset/OPA/` directory after preprocessing:
 
 ```bash
-# Install required packages
-pip install gdown
-
-# Setup all required data (OPA dataset, Scene Graphs, and GPT-2 embeddings)
-python tool/setup_data.py --all
-
-# Or selectively setup only what you need:
-# python tool/setup_data.py --opa  # Only OPA dataset
-# python tool/setup_data.py --sg   # Only Scene Graphs
+python tool/preprocess.py --data_root /path/to/OPA_dataset
+mkdir -p dataset/OPA
+mv /path/to/OPA_dataset/* dataset/OPA/
 ```
-For manual setup instructions of each dataset and more details about datasets, see [dataset/README.md](dataset/README.md).
+### Scene Graph Data
+
+Download and extract the scene graph data from [Google_Drive](https://drive.google.com/file/d/1fHjI_M6SwaHHEKcHZbHBn7dkSRTKjSXm/view?usp=sharing) and put it to `dataset/OPA_SG/` directory:
+```bash
+mkdir -p dataset/OPA_SG
+mv -r /path/to/sg_opa_background_n20/ dataset/OPA_SG/
+```
+For more details about datasets, see [dataset/README.md](dataset/README.md).
 
 ## 💻 Training
 ### Basic Training
