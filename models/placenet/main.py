@@ -18,7 +18,7 @@ import warnings
 with warnings.catch_warnings():
     warnings.filterwarnings("ignore", category=FutureWarning)
     import tensorboard_logger as tb_logger
-                                                                           #####                       #####
+
 from tool.utils import make_dirs, save, resume, make_logger, AverageMeter, save_loss_to_csv_placenet , plot_loss_from_csv
 from loader import dataset_dict, get_loader, get_dataset
 from model import GAN
@@ -119,7 +119,6 @@ def main():
         d_real_loss_meter.reset()
         d_fake_loss_meter.reset()
 
-    #####
     plot_loss_from_csv(loss_csv_file_path, opt.expid)
 
 if __name__ == '__main__':
