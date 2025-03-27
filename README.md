@@ -142,7 +142,7 @@ python tool/setup_data.py --all
 # python tool/setup_data.py --opa  # Only OPA dataset
 # python tool/setup_data.py --sg   # Only Scene Graphs
 ```
-For manual setup instructions of each dataset and more details about datasets, see [gpt2_embeddings/README.md](dataset/README.md).
+For manual setup instructions of each dataset and more details about datasets, see [dataset/README.md](dataset/README.md).
 
 ## 💻 Training
 ### Basic Training
