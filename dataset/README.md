@@ -5,7 +5,7 @@ This directory contains all the data required to train and evaluate the GraPLUS 
 1. `OPA/` - The Object Placement Assessment dataset
 2. `OPA_SG/` - Scene graph representations of the OPA background images
 
-Both datasets need to be downloaded separately (or set up using our automated script) as explained below.
+Both datasets need to be downloaded separately as explained below.
 
 ## 🖼️ OPA Dataset
 The Object Placement Assessment (OPA) dataset is a benchmark for evaluating object placement methods. It contains background images, foreground objects with masks, and composite images with annotations.
