@@ -1,14 +1,10 @@
 import os
 import logging
 import datetime
-from PIL import Image
 import torch
-
-#####
 import csv
 import pandas as pd
 import matplotlib.pyplot as plt
-import re
 
 class AccMeter():
     '''Computes and stores the correctness of the discriminator prediction'''
