@@ -108,7 +108,6 @@ def parse_args():
     parser.add_argument("--d_v", type=int, default=64, help="dimension of value in multi-head attention")
     parser.add_argument("--n_heads", type=int, default=8, help="number of heads in multi-head attention")
     parser.add_argument("--len_k", type=int, default=84, help="number of background nodes")
-    # parser.add_argument("--len_k", type=int, default=64, help="number of background nodes")
     parser.add_argument("--epoch", type=int, default=18, required=False, help="which epoch to evaluate")
     parser.add_argument("--repeat", type=int, default=1, help="number of times to sample different random vectors")
     parser.add_argument("--CUDA_VISIBLE_DEVICES", default="0", help="cuda")
