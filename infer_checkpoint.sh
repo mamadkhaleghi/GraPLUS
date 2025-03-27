@@ -11,7 +11,7 @@ fi
 EVAL_TYPE="$1"
 MODEL_NAME="$2"
 
-# Automatically set the epoch based on model name
+# Automatically set the checkpoint epoch based on model name
 case "$MODEL_NAME" in
     "graplus")
         EPOCH=21
