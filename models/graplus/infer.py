@@ -10,7 +10,6 @@ main_dir = os.path.abspath(os.path.join(current_dir, "../../"))
 # Add this directory to sys.path
 sys.path.append(main_dir)
 
-
 import argparse
 from tqdm import tqdm
 import numpy as np
@@ -19,12 +18,6 @@ import torch
 
 from loader import get_sg_loader
 from loader.utils import gen_composite_image
-
-
-OPA_path    = os.path.abspath(os.path.join(current_dir, "../../dataset/OPA/"))
-SG_OPA_path = os.path.abspath(os.path.join(current_dir, "../../dataset/OPA_SG/"))
-gpt2_path = os.path.abspath(os.path.join(current_dir, "../../gpt2_embeddings/"))
-
 
 ########################################################## Sampling
 def sample(sample_dataset, model, iter, gen_dir):
@@ -199,9 +192,9 @@ def parse_args():
     parser.add_argument("--img_size", type=int, default=256, help="size of image")
     
     parser.add_argument("--num_nodes", type=int, default=20, help="number of nodes in each scene graph")
-    parser.add_argument("--data_root", type=str, default=OPA_path, help="dataset root")
-    parser.add_argument("--sg_root", type=str, default=SG_OPA_path, help="scene graph dataset root")
-    parser.add_argument("--gpt2_path", type=str, default=gpt2_path, help="path for node/edge gpt2 embeddings ")
+    parser.add_argument("--data_root", type=str, default="OPA", help="dataset root")
+    parser.add_argument("--sg_root", type=str, default="OPA_SG", help="scene graph dataset root")
+    parser.add_argument("--gpt2_path", type=str, default="gpt2_embeddings", help="path for node/edge gpt2 embeddings ")
     parser.add_argument("--embed_dim", type=int, default=768, help="node/edge embeding dimension")
     parser.add_argument("--embed_freeze", type=lambda x: x.lower() in ['true', '1', 't', 'y', 'yes'], default=True, help="to freeze the embedding layer or not")
     parser.add_argument("--gpt2_node_mode", type=str, choices=['category_embedding', 'description_embedding', 'cat_desc_embedding', 'placement_embedding', 'cat_place_embedding', 'cat_desc_place_embedding'], default='cat_desc_place_embedding', help="Mode for selecting node embedding type")
