@@ -41,7 +41,7 @@ def parse_args():
     parser.add_argument("--sample_interval", type=int, default=100, help="interval between image sampling")
     parser.add_argument("--expid", type=str, default='test', required=False, help="experiment name")
     parser.add_argument("--resume_pth", type=str, default=None, help="specify a .pth path to resume training, or None to train from scratch")
-    parser.add_argument("--data_root", type=str, default="/data/CodeGoat24/new_OPA", help="dataset root")
+    parser.add_argument("--data_root", type=str, default="dataset/OPA", help="dataset root")
     parser.add_argument("--eval_type", type=str, choices=["train", "trainpos", "sample", "eval", "evaluni"], default="eval", help="evaluation type")
     parser.add_argument("--d_noise", type=int, default=1024, help="dimension of random noise/vector")
     parser.add_argument("--d_model", type=int, default=512, help="dimension of features")
