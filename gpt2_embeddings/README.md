@@ -9,6 +9,7 @@ This directory contains pre-computed embeddings generated using the GPT-2 langua
 - `generate_embeddings.ipynb`: Jupyter notebook containing the code used to generate these embeddings
  
 ## Overview
+![gpt2](../images/gpt2.png)
 
 The embeddings in this directory provide rich semantic representations of objects and their relationships by leveraging the pre-trained knowledge of GPT-2. Unlike traditional categorical embeddings that simply assign an arbitrary vector to each class, these embeddings capture nuanced semantic information by encoding:
 
