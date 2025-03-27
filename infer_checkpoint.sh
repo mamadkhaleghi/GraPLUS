@@ -10,7 +10,6 @@ fi
 # Store model name and evaluation type
 EVAL_TYPE="$1"
 MODEL_NAME="$2"
-shift 2  # Remove first two arguments from $@
 
 # Automatically set the epoch based on model name
 case "$MODEL_NAME" in
@@ -40,7 +39,7 @@ case "$MODEL_NAME" in
         ;;
 esac
 
-echo "Using $MODEL_NAME with epoch $EPOCH for $EVAL_TYPE evaluation"
+echo "Using $MODEL_NAME checkpoint (epoch $EPOCH) for $EVAL_TYPE evaluation"
 
 # Get the absolute path to the main project directory
 PROJECT_ROOT="$(pwd)"
@@ -85,23 +84,98 @@ cd "models/$MODEL_NAME" || {
     exit 1
 }
 
-# Run the inference script with model-specific arguments
-if [ "$MODEL_NAME" = "graplus" ]; then
-    # Special case for graplus model with additional required paths
-    python infer.py \
-        --expid "$MODEL_NAME" \
-        --data_root "$OPA_PATH" \
-        --sg_root "$SG_PATH" \
-        --gpt2_path "$GPT2_PATH" \
-        --epoch "$EPOCH" \
-        --eval_type "$EVAL_TYPE" 
+# Build and display the command before execution
+if [ "$EVAL_TYPE" = "evaluni" ]; then
+    # For evaluni, add the --repeat 10 flag
+    if [ "$MODEL_NAME" = "graplus" ]; then
+        # Special case for graplus model with additional required paths
+        CMD="cd models/$MODEL_NAME && python infer.py \\
+    --expid \"$MODEL_NAME\" \\
+    --data_root \"$OPA_PATH\" \\
+    --sg_root \"$SG_PATH\" \\
+    --gpt2_path \"$GPT2_PATH\" \\
+    --epoch \"$EPOCH\" \\
+    --eval_type \"$EVAL_TYPE\" \\
+    --repeat 10"
+    else
+        # Standard case for other models
+        CMD="cd models/$MODEL_NAME && python infer.py \\
+    --expid \"$MODEL_NAME\" \\
+    --data_root \"$OPA_PATH\" \\
+    --epoch \"$EPOCH\" \\
+    --eval_type \"$EVAL_TYPE\" \\
+    --repeat 10"
+    fi
 else
-    # Standard case for other models
-    python infer.py \
-        --expid "$MODEL_NAME" \
-        --data_root "$OPA_PATH" \
-        --epoch "$EPOCH" \
-        --eval_type "$EVAL_TYPE" 
+    # For all other eval_types (including "eval"), use the original command
+    if [ "$MODEL_NAME" = "graplus" ]; then
+        # Special case for graplus model with additional required paths
+        CMD="cd models/$MODEL_NAME && python infer.py \\
+    --expid \"$MODEL_NAME\" \\
+    --data_root \"$OPA_PATH\" \\
+    --sg_root \"$SG_PATH\" \\
+    --gpt2_path \"$GPT2_PATH\" \\
+    --epoch \"$EPOCH\" \\
+    --eval_type \"$EVAL_TYPE\""
+    else
+        # Standard case for other models
+        CMD="cd models/$MODEL_NAME && python infer.py \\
+    --expid \"$MODEL_NAME\" \\
+    --data_root \"$OPA_PATH\" \\
+    --epoch \"$EPOCH\" \\
+    --eval_type \"$EVAL_TYPE\""
+    fi
+fi
+
+# Print the command for visibility
+echo "###########################################################"
+echo "Executing command:"
+echo "$CMD"
+echo "cd "$PROJECT_ROOT""
+echo "###########################################################"
+echo ""
+
+# Execute the actual command (we still use the original cd and python execution for this)
+if [ "$EVAL_TYPE" = "evaluni" ]; then
+    # For evaluni, add the --repeat 10 flag
+    if [ "$MODEL_NAME" = "graplus" ]; then
+        # Special case for graplus model with additional required paths
+        python infer.py \
+            --expid "$MODEL_NAME" \
+            --data_root "$OPA_PATH" \
+            --sg_root "$SG_PATH" \
+            --gpt2_path "$GPT2_PATH" \
+            --epoch "$EPOCH" \
+            --eval_type "$EVAL_TYPE" \
+            --repeat 10
+    else
+        # Standard case for other models
+        python infer.py \
+            --expid "$MODEL_NAME" \
+            --data_root "$OPA_PATH" \
+            --epoch "$EPOCH" \
+            --eval_type "$EVAL_TYPE" \
+            --repeat 10
+    fi
+else
+    # For all other eval_types (including "eval"), use the original command
+    if [ "$MODEL_NAME" = "graplus" ]; then
+        # Special case for graplus model with additional required paths
+        python infer.py \
+            --expid "$MODEL_NAME" \
+            --data_root "$OPA_PATH" \
+            --sg_root "$SG_PATH" \
+            --gpt2_path "$GPT2_PATH" \
+            --epoch "$EPOCH" \
+            --eval_type "$EVAL_TYPE"
+    else
+        # Standard case for other models
+        python infer.py \
+            --expid "$MODEL_NAME" \
+            --data_root "$OPA_PATH" \
+            --epoch "$EPOCH" \
+            --eval_type "$EVAL_TYPE"
+    fi
 fi
 
 # Return to original directory
