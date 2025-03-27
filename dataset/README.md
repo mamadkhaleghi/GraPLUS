@@ -7,27 +7,9 @@ This directory contains all the data required to train and evaluate the GraPLUS 
 
 Both datasets need to be downloaded separately (or set up using our automated script) as explained below.
 
-## 📥 Automated Setup
-
-The easiest way to set up the required datasets is to use our automated setup script:
-
-```bash
-# Install required packages
-pip install gdown
-
-# Setup all required data
-python ../tool/setup_data.py --all
-
-# Or selectively setup only what you need:
-python ../tool/setup_data.py --opa  # Only OPA dataset
-python ../tool/setup_data.py --sg   # Only Scene Graph data
-```
-Alternatively, you can follow the manual setup instructions for each dataset below:
-
 ## 🖼️ OPA Dataset
 The Object Placement Assessment (OPA) dataset is a benchmark for evaluating object placement methods. It contains background images, foreground objects with masks, and composite images with annotations.
 ![opa](../images/opa.png)
-### Manual Setup
 
 1. Download and extract the OPA dataset from [Google Drive](https://drive.google.com/file/d/133Wic_nSqfrIajDnnxwvGzjVti-7Y6PF/view?usp=sharing) or [Baidu Disk](https://pan.baidu.com/s/1IzVLcXWLFgFR4GAbxZUPkw) (code: a982)
 
@@ -41,7 +23,7 @@ OPA_dataset/
   test_set.csv      # test annotation
 ```
 
-3. Preprocess the data and move it to your project directory:
+3. Preprocess the data and move it to ` dataset/OPA/` directory:
 ```bash
 python tool/preprocess.py --data_root /path/to/OPA_dataset
 mkdir -p dataset/OPA
@@ -50,7 +32,7 @@ mv /path/to/OPA_dataset/* dataset/OPA/
 
 4. After preprocessing, you'll have:
 ```
-GraPLUS/
+GraPLUS-main/
   dataset/
     OPA/
       background/
@@ -64,7 +46,7 @@ GraPLUS/
       test_data_pos_unique.csv # test annotation for positive samples with different fg/bg pairs
 ```
 ### 📜 Citation
-If you use these datasets in your research, please cite the original paper:
+If you use this dataset in your research, please cite the original paper:
 ```bibtex
 @article{liu2022opa,
   title={OPA: Object Placement Assessment Dataset},
@@ -75,30 +57,25 @@ If you use these datasets in your research, please cite the original paper:
 ```
 
 ## 🕸️ Scene Graph Dataset
-The scene graph dataset (OPA_SG/) contains structured graph representations of all background images in the OPA dataset, capturing object relationships and their interactions.
+The scene graph dataset (`OPA_SG/`) contains structured graph representations of all background images in the OPA dataset, capturing object relationships and their interactions.
 
-### Manual Setup
+1. Download and extract our generated and pre-processed scene graph data:
+   - Scene Graphs with 10 nodes (3.10 MB)  : [Google_Drive](https://drive.google.com/file/d/1dJRUm2EIj6j4zdxODyzxNT0-zzJ12D6S/view?usp=sharing)
+   - **Scene Graphs with 20 nodes (10.3 MB)** : [**Google_Drive**](https://drive.google.com/file/d/1fHjI_M6SwaHHEKcHZbHBn7dkSRTKjSXm/view?usp=sharing) (**Default**)
+   - Scene Graphs with 30 nodes (21.7 MB)  : [Google_Drive](https://drive.google.com/file/d/1vv9k-3Ki_li5yH-azJKKRGwEs1W6TeMX/view?usp=sharing)
 
-1. Download our pre-processed scene graph data:
-   - [Scene Graphs with 20 nodes (Default)](https://drive.google.com/file/d/1xxxxxxxxxxxxx/view?usp=sharing)
-   - [Scene Graphs with 10 nodes](https://drive.google.com/file/d/1xxxxxxxxxxxxx/view?usp=sharing)
-   - [Scene Graphs with 30 nodes](https://drive.google.com/file/d/1xxxxxxxxxxxxx/view?usp=sharing)
-
-2. Extract and place the scene graph data in your project:
+2. Move the extracted scene graph data to ` dataset/OPA_SG/` directory:
 ```bash
 mkdir -p dataset/OPA_SG
-# Extract default (20 nodes) scene graphs
-tar -xzf OPA_SG_20.tar.gz -C dataset/OPA_SG
+mv -r /path/to/sg_opa_background_n20/ dataset/OPA_SG/
 
-#Optional: Extract sparse (10 nodes) and dense (30 nodes) scene graphs
-#tar -xzf OPA_SG_10.tar.gz -C dataset/OPA_SG
-#tar -xzf OPA_SG_30.tar.gz -C dataset/OPA_SG
+# mv -r /path/to/sg_opa_background_n10/ dataset/OPA_SG/
+# mv -r /path/to/sg_opa_background_n30/ dataset/OPA_SG/
 ```
-
 
 3. Each scene graph directory structure should be:
 ```
-GraPLUS/
+GraPLUS-main/
   dataset/
     OPA_SG/
       sg_opa_background_nX/      # Scene graphs with X nodes for background images
