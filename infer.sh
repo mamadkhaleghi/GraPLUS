@@ -14,6 +14,10 @@ EXPID="$3"
 EPOCH="$4"
 shift 4  # Remove first four arguments from $@
 
+
+echo "Using $EXPID experiment of $MODEL_NAME model with epoch $EPOCH for $EVAL_TYPE inference"
+
+
 # Get the absolute path to the main project directory
 PROJECT_ROOT="$(pwd)"
 
@@ -50,6 +54,48 @@ if [ "$MODEL_NAME" = "graplus" ]; then
         exit 1
     fi
 fi
+
+# Build and display the command before execution
+if [ "$MODEL_NAME" = "graplus" ]; then
+    # Special case for graplus model with additional required paths
+    CMD="cd models/$MODEL_NAME && python infer.py \\
+    --expid \"$EXPID\" \\
+    --data_root \"$OPA_PATH\" \\
+    --sg_root \"$SG_PATH\" \\
+    --gpt2_path \"$GPT2_PATH\" \\
+    --epoch \"$EPOCH\" \\
+    --eval_type \"$EVAL_TYPE\""
+    
+    # Add any additional arguments
+    for arg in "$@"; do
+        CMD+=" \\
+    $arg"
+    done
+else
+    # Standard case for other models
+    CMD="cd models/$MODEL_NAME && python infer.py \\
+    --expid \"$EXPID\" \\
+    --data_root \"$OPA_PATH\" \\
+    --epoch \"$EPOCH\" \\
+    --eval_type \"$EVAL_TYPE\""
+    
+    # Add any additional arguments
+    for arg in "$@"; do
+        CMD+=" \\
+    $arg"
+    done
+fi
+
+# Print the command for visibility and information about output files
+echo "########################################################### Executing command:"
+echo "$CMD"
+echo "cd \"$PROJECT_ROOT\""
+echo "########################################################### Generated files will be saved to:"
+echo " - composite images:    $PROJECT_ROOT/result/$EXPID/$EVAL_TYPE/$EPOCH/images/*.jpg"
+echo " - foreground masks:    $PROJECT_ROOT/result/$EXPID/$EVAL_TYPE/$EPOCH/masks/*.png"
+echo " - informed csv file :  $PROJECT_ROOT/result/$EXPID/$EVAL_TYPE/$EPOCH/$EVAL_TYPE.csv"
+echo "###########################################################"
+echo ""
 
 # Change to the specific model directory
 cd "models/$MODEL_NAME" || {
