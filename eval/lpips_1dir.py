@@ -47,6 +47,53 @@ def create_unique_zero_idx_list(OPA_path):
 #------------------------------------------------------------#
 
 '''
+
+def save_to_csv( metrics_csv_path, epoch, dist_avg_original, dist_stderr_original):
+    
+    dist_avg    = round(dist_avg_original   , 3) 
+    dist_stderr = round(dist_stderr_original, 6) 
+    #----------------------------------------------------------#  Save metrics to 'metrics.csv'
+
+    # Prepare the metrics DataFrame for the current epoch
+    metrics_data = pd.DataFrame({
+        'epoch': [epoch],
+        'accuracy': [None],
+        'fid': [None],
+
+        'lpips_dist_avg': [dist_avg],
+        'lpips_stderr': [dist_stderr],
+        
+        'mean_iou':[None],
+        'percentage_above_50_iou': [None],
+        'mean_center_distance':[None],
+        'center_distance_under_50px': [None],
+        'scale_ratio_over_80': [None]
+   })
+
+    if os.path.exists(metrics_csv_path):
+        # Read the existing metrics CSV file
+        df_metrics_existing = pd.read_csv(metrics_csv_path)
+
+        # Check if the current epoch already exists
+        if epoch in df_metrics_existing['epoch'].values:
+            # Update the accuracy for the existing row
+            df_metrics_existing.loc[df_metrics_existing['epoch'] == epoch, 'lpips_dist_avg'] = dist_avg
+            df_metrics_existing.loc[df_metrics_existing['epoch'] == epoch, 'lpips_stderr'] = dist_stderr
+
+        else:
+            # Append the new entry
+            df_metrics_existing = pd.concat([df_metrics_existing, metrics_data], ignore_index=True)
+    else:
+        # If file doesn't exist, create a new DataFrame with the current metrics
+        df_metrics_existing = metrics_data
+
+    # Sort the DataFrame by epoch
+    df_metrics_existing = df_metrics_existing.sort_values(by='epoch').reset_index(drop=True)
+
+    # Save the updated metrics DataFrame back to CSV
+    df_metrics_existing.to_csv(metrics_csv_path, index=False)
+
+
 def main():
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('-d','--dir', type=str, default='./imgs/ex_dir')
@@ -106,69 +153,17 @@ def main():
     dist_avg = np.mean(dist_res[:,0])
     dist_stderr = np.mean(dist_res[:,1])
 
-    #=================================================================###
-    #=================================================================###
-    dir_path = os.path.join('result', opt.expid, 'models')
-    eval_metrics_dir = os.path.join(dir_path, f"{opt.expid}_eval_metrics")
-    os.makedirs(eval_metrics_dir, exist_ok=True)
-
-
-    save_to_csv(eval_metrics_dir, opt.expid, opt.epoch, dist_avg, dist_stderr)
-    #=================================================================###
-    #=================================================================###
-
-    print(f"\nModel Name:{opt.expid} - epoch:{opt.epoch} =====>  LPIPS (Variety): dist = {dist_avg:.3f}, stderr = {dist_stderr:.6f}\n")
-    # mark = 'a' if os.path.exists(os.path.join(data_dir, "{}_lpips_variety.txt".format(opt.eval_type))) else 'w'
-    # with open(os.path.join(data_dir, "{}_lpips_variety.txt".format(opt.eval_type)), mark) as f:
-    #     f.write("{}\n".format(datetime.datetime.now()))
-    #     f.write(" - LPIPS (Variety): dist = {:.3f}, stderr = {:.6f}\n".format(dist_avg, dist_stderr))
-
-
-#=========================================================================================================================###
-def save_to_csv( dir, expid, epoch, dist_avg_original, dist_stderr_original):
+    expid_dir = os.path.join("result", opt.expid)
+    metrics_csv_path = os.path.join(expid_dir, f'eval_metrics_{opt.expid}.csv')
     
-    # Ensure the directory exists
-    os.makedirs(dir, exist_ok=True)
+    metrics_csv_path = os.path.join(expid_dir, f'eval_metrics_{opt.expid}.csv')
 
-    dist_avg    = round(dist_avg_original   , 3) 
-    dist_stderr = round(dist_stderr_original, 6) 
-    #----------------------------------------------------------#  Save metrics to 'metrics.csv'
-    metrics_file = os.path.join(dir, f'metrics_{expid}.csv')
+    print(f"\nModel Name:{opt.expid} - epoch:{opt.epoch} =====>  LPIPS (Variety): dist = {dist_avg:.3f}, stderr = {dist_stderr:.6f}")
 
-    # Prepare the metrics DataFrame for the current epoch
-    metrics_data = pd.DataFrame({
-        'epoch': [epoch],
-        'accuracy': [None],
-        'fid': [None],
-        'lpips_dist_avg': [dist_avg],
-        'lpips_stderr': [dist_stderr]
-    })
+    save_to_csv(metrics_csv_path, opt.epoch, dist_avg, dist_stderr)
 
-    if os.path.exists(metrics_file):
-        # Read the existing metrics CSV file
-        df_metrics_existing = pd.read_csv(metrics_file)
+    print(f'\nResults of LPIPS Evaluation saved to: {metrics_csv_path}')        
 
-        # Check if the current epoch already exists
-        if epoch in df_metrics_existing['epoch'].values:
-            # Update the accuracy for the existing row
-            df_metrics_existing.loc[df_metrics_existing['epoch'] == epoch, 'lpips_dist_avg'] = dist_avg
-            df_metrics_existing.loc[df_metrics_existing['epoch'] == epoch, 'lpips_stderr'] = dist_stderr
-
-        else:
-            # Append the new entry
-            df_metrics_existing = pd.concat([df_metrics_existing, metrics_data], ignore_index=True)
-    else:
-        # If file doesn't exist, create a new DataFrame with the current metrics
-        df_metrics_existing = metrics_data
-
-    # Sort the DataFrame by epoch
-    df_metrics_existing = df_metrics_existing.sort_values(by='epoch').reset_index(drop=True)
-
-    # Save the updated metrics DataFrame back to CSV
-    df_metrics_existing.to_csv(metrics_file, index=False)
-
-
-#=================================================================###
 
 if __name__ == '__main__':
     main()
