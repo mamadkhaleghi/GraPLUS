@@ -12,12 +12,9 @@ import pandas as pd
 
 
 def save_to_csv(metrics_csv_path, epoch, pred_acc):
-
-
     # Round pred_acc to 3 decimal places
     pred_acc = round(pred_acc, 3)
-
-
+    
     # Prepare the metrics DataFrame for the current epoch
     metrics_data = pd.DataFrame({
         'epoch': [epoch],
@@ -55,7 +52,6 @@ def save_to_csv(metrics_csv_path, epoch, pred_acc):
     df_metrics_existing.to_csv(metrics_csv_path, index=False)
 
 
-
 def save_SimOPA_pred_to_csv(sample_ids, pred_labels, SimOPA_Preds_csv_path):
     ''' Save predictions to separate CSV files for each epoch '''
     # Create a DataFrame from the current predictions
@@ -66,7 +62,6 @@ def save_SimOPA_pred_to_csv(sample_ids, pred_labels, SimOPA_Preds_csv_path):
 
     # Save the DataFrame to a CSV file
     data.to_csv(SimOPA_Preds_csv_path, index=False)
-
 
 
 def evaluate(args):
@@ -118,10 +113,10 @@ def evaluate(args):
 
 
     pred_acc = (np.array(pred_labels, dtype=np.int32) == 1).sum() / len(pred_labels)
+    print(f"\n{args.expid} - epoch:{args.epoch} =====>  Accuracy = {pred_acc:.3f}")
 
     expid_dir = os.path.join('result', args.expid)
     metrics_csv_path = os.path.join(expid_dir, f'eval_metrics_{args.expid}.csv')
-    print(f"\n{args.expid} - epoch:{args.epoch} =====>  Accuracy = {pred_acc:.3f}")
 
     save_to_csv(metrics_csv_path, args.epoch, pred_acc)
     print(f'\nResults of Accuracy Evaluation saved to: {metrics_csv_path}')        
