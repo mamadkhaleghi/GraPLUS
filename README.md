@@ -7,8 +7,6 @@
 **Mir Mohammad Khaleghi, Mehran Safayani, Abdolreza Mirzaei**  
 Department of Electrical and Computer Engineering, Isfahan University of Technology, Isfahan, Iran
 
-![GraPLUS](images/framework.png)
-
 ## 📑 Table of Contents
 - [Abstract](#abstract)  
 - [Key Innovations](#-key-innovations)
@@ -44,7 +42,7 @@ GraPLUS achieves placement accuracy of **92.1%** and an FID score of 28.83 on th
 - **Multi-Objective Training**: Our approach incorporates semantic consistency constraints alongside adversarial learning.
 
 ## 📊 Model Architecture
-
+![GraPLUS](images/framework.png)
 GraPLUS consists of four principal components:
 
 1. **Scene Graph Processing**: Transforms background images into structured graph representations using a pre-trained Neural-MOTIFS model.
