@@ -1,5 +1,4 @@
 import argparse
-import datetime
 import os
 import torch
 from tqdm import tqdm
@@ -10,6 +9,65 @@ from simopa_cfg import opt
 from simopa_dst import ImageDataset
 from simopa_net import ObjectPlaceNet
 import pandas as pd
+
+
+def save_to_csv(metrics_csv_path, epoch, pred_acc):
+
+
+    # Round pred_acc to 3 decimal places
+    pred_acc = round(pred_acc, 3)
+
+
+    # Prepare the metrics DataFrame for the current epoch
+    metrics_data = pd.DataFrame({
+        'epoch': [epoch],
+        'accuracy': [pred_acc],
+        'fid': [None],
+        'lpips_dist_avg': [None],
+        'lpips_stderr': [None],
+
+        'mean_iou':[None],
+        'percentage_above_50_iou': [None],
+        'mean_center_distance': [None],
+        'center_distance_under_50px': [None],
+        'scale_ratio_over_80': [None]
+    })
+
+    if os.path.exists(metrics_csv_path):
+        # Read the existing metrics CSV file
+        df_metrics_existing = pd.read_csv(metrics_csv_path)
+
+        # Check if the current epoch already exists
+        if epoch in df_metrics_existing['epoch'].values:
+            # Update the accuracy for the existing row
+            df_metrics_existing.loc[df_metrics_existing['epoch'] == epoch, 'accuracy'] = pred_acc
+        else:
+            # Append the new entry
+            df_metrics_existing = pd.concat([df_metrics_existing, metrics_data], ignore_index=True)
+    else:
+        # If file doesn't exist, create a new DataFrame with the current metrics
+        df_metrics_existing = metrics_data
+
+    # Sort the DataFrame by epoch
+    df_metrics_existing = df_metrics_existing.sort_values(by='epoch').reset_index(drop=True)
+
+    # Save the updated metrics DataFrame back to CSV
+    df_metrics_existing.to_csv(metrics_csv_path, index=False)
+
+
+
+def save_SimOPA_pred_to_csv(sample_ids, pred_labels, SimOPA_Preds_csv_path):
+    ''' Save predictions to separate CSV files for each epoch '''
+    # Create a DataFrame from the current predictions
+    data = pd.DataFrame({
+        'sample_ids': sample_ids,
+        'pred_labels': pred_labels
+    })
+
+    # Save the DataFrame to a CSV file
+    data.to_csv(SimOPA_Preds_csv_path, index=False)
+
+
 
 def evaluate(args):
     # modify configs
@@ -59,93 +117,23 @@ def evaluate(args):
             sample_ids.extend(list(sample_id))
 
 
- 
-
-
     pred_acc = (np.array(pred_labels, dtype=np.int32) == 1).sum() / len(pred_labels)
 
+    expid_dir = os.path.join('result', args.expid)
+    metrics_csv_path = os.path.join(expid_dir, f'eval_metrics_{args.expid}.csv')
+    print(f"\n{args.expid} - epoch:{args.epoch} =====>  Accuracy = {pred_acc:.3f}")
 
-    #=================================================================###
-    dir_path = os.path.join('result', args.expid, 'models')
-    eval_metrics_dir = os.path.join(dir_path, f"{args.expid}_eval_metrics")
-    os.makedirs(eval_metrics_dir, exist_ok=True)
+    save_to_csv(metrics_csv_path, args.epoch, pred_acc)
+    print(f'\nResults of Accuracy Evaluation saved to: {metrics_csv_path}')        
 
-
-    save_to_csv(eval_metrics_dir, args.expid, args.epoch, pred_acc)
-    save_SimOPA_pred_to_csv(sample_ids, pred_labels, eval_metrics_dir, args.epoch)
-    #=================================================================###
-
-    print(f"\nModel Name:{args.expid} - epoch:{args.epoch} =====>  Accuracy = {pred_acc:.3f}\n")
-    # mark = 'a' if os.path.exists(os.path.join(opt.dataset_path, "{}_acc.txt".format(args.eval_type))) else 'w'
-    # with open(os.path.join(opt.dataset_path, "{}_acc.txt".format(args.eval_type)), mark) as f:
-    #     f.write("{}\n".format(datetime.datetime.now()))
-    #     f.write(" - Accuracy = {:.3f}\n".format(pred_acc))
-
-
-#=========================================================================================================================###
-def save_to_csv(dir, expid, epoch, pred_acc):
-        # Ensure the directory exists
-    os.makedirs(dir, exist_ok=True)
-
-    # Round pred_acc to 3 decimal places
-    pred_acc = round(pred_acc, 3)
-
-    metrics_file = os.path.join(dir, f'metrics_{expid}.csv')
-
-    # Prepare the metrics DataFrame for the current epoch
-    metrics_data = pd.DataFrame({
-        'epoch': [epoch],
-        'accuracy': [pred_acc],
-        'fid': [None],
-        'lpips_dist_avg': [None],
-        'lpips_stderr': [None]
-    })
-
-    if os.path.exists(metrics_file):
-        # Read the existing metrics CSV file
-        df_metrics_existing = pd.read_csv(metrics_file)
-
-        # Check if the current epoch already exists
-        if epoch in df_metrics_existing['epoch'].values:
-            # Update the accuracy for the existing row
-            df_metrics_existing.loc[df_metrics_existing['epoch'] == epoch, 'accuracy'] = pred_acc
-        else:
-            # Append the new entry
-            df_metrics_existing = pd.concat([df_metrics_existing, metrics_data], ignore_index=True)
-    else:
-        # If file doesn't exist, create a new DataFrame with the current metrics
-        df_metrics_existing = metrics_data
-
-    # Sort the DataFrame by epoch
-    df_metrics_existing = df_metrics_existing.sort_values(by='epoch').reset_index(drop=True)
-
-    # Save the updated metrics DataFrame back to CSV
-    df_metrics_existing.to_csv(metrics_file, index=False)
-
-
-#=================================================================###
-def save_SimOPA_pred_to_csv(sample_ids, pred_labels, dir, epoch):
-    ''' Save predictions to separate CSV files for each epoch '''
-    # Ensure the directory exists
-    predictions_dir = os.path.join(dir, 'SimOPA_per_image_predictions')
+    predictions_dir = os.path.join(expid_dir, f'SimOPA_preds_on_{args.expid}')
     os.makedirs(predictions_dir, exist_ok=True)
+    SimOPA_Preds_csv_path = os.path.join(predictions_dir, f'SimOPA_preds_on_{args.expid}_with_epoch_{args.epoch}.csv')
 
-    # Define the CSV file path for the current epoch
-    csv_file = os.path.join(predictions_dir, f'predictions_epoch_{epoch}.csv')
+    save_SimOPA_pred_to_csv(sample_ids, pred_labels, SimOPA_Preds_csv_path)
+    print(f'SimOPA Per-Image Predictions saved to: {SimOPA_Preds_csv_path}')        
 
-    # Create a DataFrame from the current predictions
-    data = pd.DataFrame({
-        'sample_ids': sample_ids,
-        'pred_labels': pred_labels
-    })
-
-    # Save the DataFrame to a CSV file
-    data.to_csv(csv_file, index=False)
-    print(f"Saved predictions for epoch {epoch} to {csv_file}")
-
-
-#=================================================================###
-
+    
 
 if __name__ == '__main__':
     
