@@ -36,7 +36,6 @@ import os
 import pathlib
 from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
 import pandas as pd
-import shutil
 
 import numpy as np
 import torch
@@ -54,11 +53,6 @@ except ImportError:
 
 from inception import InceptionV3
 
-current_dir = os.path.dirname(os.path.abspath(__file__))
-OPA_path    = os.path.abspath(os.path.join(current_dir, "../../OPA_dataset"))
-
-
-
 parser = ArgumentParser(formatter_class=ArgumentDefaultsHelpFormatter)
 parser.add_argument('--batch-size', type=int, default=50,
                     help='Batch size to use')
@@ -71,11 +65,9 @@ parser.add_argument('--dims', type=int, default=2048,
                     choices=list(InceptionV3.BLOCK_INDEX_BY_DIM),
                     help=('Dimensionality of Inception features to use. '
                           'By default, uses pool3 features'))
-
-###
-# parser.add_argument('path', type=str, nargs=2,
-#                     help=('Paths to the generated images or '
-#                           'to .npz statistic files'))
+parser.add_argument('path', type=str, nargs=2,
+                    help=('Paths to the generated images or '
+                          'to .npz statistic files'))
 
 ### START ADD ###
 parser.add_argument("--expid", type=str, required=True, help="experiment name")
@@ -244,11 +236,8 @@ def calculate_activation_statistics(files, model, batch_size=50, dims=2048,
     return mu, sigma
 
 
-def compute_statistics_of_path(path, model, batch_size, dims, device, eval_type, zero_idx_list, num_workers=1):
-    
-    print("$"*50)
-    print("path: ", path)
-
+def compute_statistics_of_path(path, model, batch_size, dims, device,
+                               num_workers=1):
     if path.endswith('.npz'):
         with np.load(path) as f:
             m, s = f['mu'][:], f['sigma'][:]
@@ -256,21 +245,13 @@ def compute_statistics_of_path(path, model, batch_size, dims, device, eval_type,
         path = pathlib.Path(path)
         files = sorted([file for ext in IMAGE_EXTENSIONS
                        for file in path.glob('*.{}'.format(ext))])
-        ###
-        if eval_type=="real_eval":
-            assert zero_idx_list is not None
-            # Filter out files starting with numbers in zero_idx_list
-            files = [f for f in files if int(f.stem.split('_')[0]) not in zero_idx_list]
-        # print("type(files): ",type(files))
-        # print("files:", files)
-
         m, s = calculate_activation_statistics(files, model, batch_size,
                                                dims, device, num_workers)
 
     return m, s
 
 
-def calculate_fid_given_paths(paths, batch_size, device, dims, eval_type, zero_idx_list, num_workers=1):
+def calculate_fid_given_paths(paths, batch_size, device, dims, num_workers=1):
     """Calculates the FID of two paths"""
     for p in paths:
         if not os.path.exists(p):
@@ -281,51 +262,52 @@ def calculate_fid_given_paths(paths, batch_size, device, dims, eval_type, zero_i
     model = InceptionV3([block_idx]).to(device)
 
     m1, s1 = compute_statistics_of_path(paths[0], model, batch_size,
-                                        dims, device, eval_type, zero_idx_list, num_workers)
+                                        dims, device, num_workers)
     m2, s2 = compute_statistics_of_path(paths[1], model, batch_size,
-                                        dims, device, eval_type, zero_idx_list, num_workers)
+                                        dims, device, num_workers)
     fid_value = calculate_frechet_distance(m1, s1, m2, s2)
 
     return fid_value
 
 
 
+def save_to_csv(metrics_csv_path, epoch, fid_score):
+   
 
-def create_zero_idx_list(OPA_path):
+   fid_score = round(fid_score, 2)
 
-    eval_result = pd.read_csv(os.path.join(OPA_path, "SimOPA_preds_on_test_pos_data.csv"), sep=',')
-    SimOPA_labels = list(eval_result['pred_labels'])
+   metrics_data = pd.DataFrame({
+       'epoch': [epoch],
+       'accuracy': [None],
+       'fid': [fid_score],
+       'lpips_dist_avg': [None],
+       'lpips_stderr': [None],
+       
+        'mean_iou':[None],
+        'percentage_above_50_iou': [None],
+        'mean_center_distance': [None],
+        'center_distance_under_50px': [None],
+        'scale_ratio_over_80': [None]
+   })
 
-    zero_idx_list = []
-    # Iterate through the input list and store the indexes of ones and zeros
-    for i, value in enumerate(SimOPA_labels):
-        if value == 0:
-            zero_idx_list.append(i)
+   if os.path.exists(metrics_csv_path):
+       df_metrics_existing = pd.read_csv(metrics_csv_path)
 
-    return zero_idx_list
+       if epoch in df_metrics_existing['epoch'].values:
+           df_metrics_existing.loc[df_metrics_existing['epoch'] == epoch, 'fid'] = fid_score
+       else:
+           df_metrics_existing = pd.concat([df_metrics_existing, metrics_data], ignore_index=True)
+   else:
+       df_metrics_existing = metrics_data
+
+   df_metrics_existing = df_metrics_existing.sort_values(by='epoch').reset_index(drop=True)
+   df_metrics_existing.to_csv(metrics_csv_path, index=False)
+
+
 
 def main():
     args = parser.parse_args()
-    ###------------------------------------------------------------------------------#
-    test_set_GT_path = os.path.join(OPA_path, "com_pic_testpos299")
-    
-    if args.eval_type=='eval':
-        generated_images_path = os.path.join('result', args.expid, 'eval', str(args.epoch), 'images299')
-    if args.eval_type=='evaluni':
-        generated_images_path = os.path.join('result', args.expid, 'evaluni', str(args.epoch), 'images299')
-
-    if args.eval_type=="real_eval":
-        generated_images_path = os.path.join('result', args.expid, 'eval', str(args.epoch), 'images299')
-        zero_idx_list = create_zero_idx_list(OPA_path)
-    else:
-        zero_idx_list = None
-
-    paths = [generated_images_path, test_set_GT_path]
-    
-    # data_dir = os.path.join('result', args.expid, args.eval_type, str(args.epoch)) ###
-    data_dir = os.path.join('result', args.expid, 'eval', str(args.epoch))
-    ###------------------------------------------------------------------------------#
-
+    data_dir = os.path.join('result', args.expid, args.eval_type, str(args.epoch))
     assert (os.path.exists(data_dir))
 
     if args.device is None:
@@ -339,105 +321,19 @@ def main():
     else:
         num_workers = args.num_workers
 
-    fid_value = calculate_fid_given_paths(paths,
+    fid_value = calculate_fid_given_paths(args.path,
                                           args.batch_size,
                                           device,
                                           args.dims,
-                                          args.eval_type, 
-                                          zero_idx_list,
                                           num_workers)
-    
 
-    #=================================================================###
-    #=================================================================###
-    dir_path = os.path.join('result', args.expid, 'models')
-    eval_metrics_dir = os.path.join(dir_path, f"{args.expid}_eval_metrics")
-    os.makedirs(eval_metrics_dir, exist_ok=True)
+    print(f"{args.expid} - epoch:{args.epoch}   - eval_type:{args.eval_type} =====>  FID = {fid_value:.2f}\n")
 
+    expid_dir = os.path.join('result', args.expid)
+    metrics_csv_path = os.path.join(expid_dir, f'eval_metrics_{args.expid}.csv')
+    save_to_csv(metrics_csv_path, args.epoch, fid_value)    
+    print(f'\nResults of FID Evaluation saved to: {metrics_csv_path}')        
 
-    save_to_csv(eval_metrics_dir, args.expid, args.epoch, fid_value, args.eval_type)    
-    #=================================================================###
-    #=================================================================###
-
-    print(f"\nModel Name:{args.expid} - epoch:{args.epoch}   - eval_type:{args.eval_type} =====>  FID = {fid_value:.2f}\n")
-    # mark = 'a' if os.path.exists(os.path.join(data_dir, "{}_fid.txt".format(args.eval_type))) else 'w'
-    # with open(os.path.join(data_dir, "{}_fid.txt".format(args.eval_type)), mark) as f:
-    #     f.write("{}\n".format(datetime.datetime.now()))
-    #     f.write(" - FID = {:.2f}\n".format(fid_value))
-
-
-
-#=========================================================================================================================###
-# def save_to_csv( dir,expid, epoch, fid_score):
-#     # Ensure the directory exists
-#     os.makedirs(dir, exist_ok=True)
-
-#     # Round pred_acc to 2 decimal places
-#     fid_score = round(fid_score, 2) 
-#     #----------------------------------------------------------#  Save metrics to 'metrics.csv'
-#     metrics_file = os.path.join(dir, f'metrics_{expid}.csv')
-
-#     # Prepare the metrics DataFrame for the current epoch
-#     metrics_data = pd.DataFrame({
-#         'epoch': [epoch],
-#         'accuracy': [None],
-#         'fid': [fid_score],
-#         'lpips_dist_avg': [None],
-#         'lpips_stderr': [None]
-#     })
-
-#     if os.path.exists(metrics_file):
-#         # Read the existing metrics CSV file
-#         df_metrics_existing = pd.read_csv(metrics_file)
-
-#         # Check if the current epoch already exists
-#         if epoch in df_metrics_existing['epoch'].values:
-#             # Update the accuracy for the existing row
-#             df_metrics_existing.loc[df_metrics_existing['epoch'] == epoch, 'fid'] = fid_score
-#         else:
-#             # Append the new entry
-#             df_metrics_existing = pd.concat([df_metrics_existing, metrics_data], ignore_index=True)
-#     else:
-#         # If file doesn't exist, create a new DataFrame with the current metrics
-#         df_metrics_existing = metrics_data
-
-#     # Sort the DataFrame by epoch
-#     df_metrics_existing = df_metrics_existing.sort_values(by='epoch').reset_index(drop=True)
-
-#     # Save the updated metrics DataFrame back to CSV
-#     df_metrics_existing.to_csv(metrics_file, index=False)
-
-def save_to_csv(dir, expid, epoch, fid_score, eval_type):
-   os.makedirs(dir, exist_ok=True)
-   fid_score = round(fid_score, 2)
-   metrics_file = os.path.join(dir, f'metrics_{expid}.csv')
-
-   metrics_data = pd.DataFrame({
-       'epoch': [epoch],
-       'accuracy': [None],
-       'fid': [fid_score] if eval_type=='eval' else [None],
-       'real_fid': [fid_score] if eval_type=='real_eval' else [None], 
-       'lpips_dist_avg': [None],
-       'lpips_stderr': [None],
-       'real_lpips_dist_avg': [None],
-       'real_lpips_stderr': [None]
-   })
-
-   if os.path.exists(metrics_file):
-       df_metrics_existing = pd.read_csv(metrics_file)
-       if epoch in df_metrics_existing['epoch'].values:
-           if eval_type == 'eval':
-               df_metrics_existing.loc[df_metrics_existing['epoch'] == epoch, 'fid'] = fid_score
-           else:
-               df_metrics_existing.loc[df_metrics_existing['epoch'] == epoch, 'real_fid'] = fid_score
-       else:
-           df_metrics_existing = pd.concat([df_metrics_existing, metrics_data], ignore_index=True)
-   else:
-       df_metrics_existing = metrics_data
-
-   df_metrics_existing = df_metrics_existing.sort_values(by='epoch').reset_index(drop=True)
-   df_metrics_existing.to_csv(metrics_file, index=False)
-#=================================================================###
 
 
 if __name__ == '__main__':
