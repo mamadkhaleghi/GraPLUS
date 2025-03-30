@@ -129,6 +129,7 @@ cd GraPLUS-main
 GraPLUS requires two datasets:
 
 **OPA Dataset**: Object Placement Assessment dataset with background/foreground images
+
 **Scene Graph Data**: Pre-processed graph representations of OPA background images
 
 ### OPA Dataset
@@ -153,12 +154,12 @@ For more details about datasets, see [dataset/README.md](dataset/README.md).
 ### Basic Training
 To train GraPLUS with default settings:
 ```bash
-./train.sh graplus YOUR_EXPERIMENT_NAME 
+./train.sh graplus <experiment_name>  
 ```
 ### Advanced Training Options
 You can customize various parameters:
 ```bash
-./train.sh graplus YOUR_EXPERIMENT_NAME \
+./train.sh graplus <experiment_name>  \
   --batch_size 64 \
   --n_epochs 40 \
   --gtn_num_head 8 \
@@ -173,44 +174,44 @@ You can customize various parameters:
 
 To train other models, simply replace `graplus` with the name of the model you want to train (model names correspond to subdirectories in the `models` directory, such as `cagan`, `csanet`, `graconet`, `placenet`, or `terse`):
 ```bash
-./train.sh MODEL_NAME YOUR_EXPERIMENT_NAME 
+./train.sh  <model_name> <experiment_name> 
 ```
-Training files will be saved to `result/YOUR_EXPERIMENT_NAME/`.
+Training files will be saved to `result/experiment_name/`.
 
 ### Training Monitoring
 To monitor the training progress:
 ```bash
-tensorboard --logdir result/YOUR_EXPERIMENT_NAME/tblog --port YOUR_SPECIFIED_PORT
+tensorboard --logdir result/experiment_name/tblog --port YOUR_SPECIFIED_PORT
 ```
 
 ## 🔥 Inference
 To generate composite images from a trained model:
 ```bash
-./infer.sh eval graplus YOUR_EXPERIMENT_NAME EPOCH_NUMBER 
+./infer.sh eval graplus <experiment_name>  <epoch> 
 ```
 or
 ```bash
-./infer.sh evaluni graplus YOUR_EXPERIMENT_NAME EPOCH_NUMBER 
+./infer.sh evaluni graplus <experiment_name>  <epoch> 
 ```
 To infer other models, simply replace `graplus` with the name of the model you want to train (model names correspond to subdirectories in the `models` directory, such as `cagan`, `csanet`, `graconet`, `placenet`, or `terse`):
 ```bash
-./infer.sh eval MODEL_NAME YOUR_EXPERIMENT_NAME EPOCH_NUMBER
-./infer.sh evaluni MODEL_NAME YOUR_EXPERIMENT_NAME  EPOCH_NUMBER
+./infer.sh eval <model_name> <experiment_name> <epoch>
+./infer.sh evaluni <model_name> <experiment_name>  <epoch>
 ```
-The output files of inference will be saved in `result/MODEL_NAME/eval/EPOCH_NUMBER` and `result/MODEL_NAME/evaluni/EPOCH_NUMBER` respectively.
+The output files of inference will be saved in `result/model_name/eval/epoch` and `result/model_name/evaluni/epoch` respectively.
 
 ## Inference Using Pre-trained Models
 1. Download the model from the provided link above
 2. Extract it to the `result/` directory
 3. Run:
 ```bash
-./infer_checkpoint.sh eval MODEL_NAME
+./infer_checkpoint.sh eval <model_name>
 ```
 or 
 ```bash
-./infer_checkpoint.sh evaluni MODEL_NAME
+./infer_checkpoint.sh evaluni <model_name>
 ```
-The output files will be saved in `result/MODEL_NAME/eval/` and `result/MODEL_NAME/evaluni/` respectively.
+The output files will be saved in `result/model_name/eval/` and `result/model_name/evaluni/` respectively.
 model names correspond to subdirectories in the `models` directory, such as `graplus`, `cagan`, `csanet`, `graconet`, `placenet`, or `terse`):
 
 
@@ -227,27 +228,32 @@ Before evaluation, you'll need these pre-trained models:
    - Download from [Google Drive](https://drive.google.com/file/d/18n_3V1rywgeADZ3oONO0DsuuS9eMW6sN/view)
    - Place the file as `faster-rcnn/models/faster_rcnn_res101_vg.pth`
 
-### All-in-One Evaluation
-To evaluate all metrics at once:
 
+### Running Evaluations
+
+Use the `evaluate.sh` script in the main directory to run evaluations on your trained models:
+
+#### Usage
 ```bash
-./eval.sh YOUR_EXPERIMENT_NAME EPOCH_NUMBER
+./evaluate.sh <experiment_name> <epoch> <metric> 
+```
+
+#### Examples
+```bash
+./evaluate.sh graplus 21 accuracy   # Evaluate Accuracy
+./evaluate.sh graplus 21 fid        # Evaluate FID
+./evaluate.sh graplus 21 lpips      # Evaluate LPIPS
+./evaluate.sh graplus 21 sp         # Evaluate Spatial Precision
+./evaluate.sh graplus 21 all        # Run all evaluations
 ```
 
 This script will automatically evaluate:
 - **Accuracy**: Uses a binary classifier to determine placement plausibility
 - **FID**: Measures visual quality compared to ground truth
 - **LPIPS**: Quantifies generation diversity
+- **Spatial Precision**: Computes Spatial Precision metrics
 
-### Viewing Results
-To view summarized evaluation results:
-
-```bash
-python tool/summarize.py --expid YOUR_EXPERIMENT_NAME --eval_type eval
-python tool/summarize.py --expid YOUR_EXPERIMENT_NAME --eval_type evaluni
-```
-
-Results will be available at `result/YOUR_EXPERIMENT_NAME/*_resall.txt`.
+Results will be available at `result/experiment_name/eval_metrics_experiment_name.csv`.
 
 ## 📈 Results
 
