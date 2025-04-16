@@ -148,6 +148,12 @@ def compare_models(gt_path, pred_path):
 
 
 def save_to_csv(metrics_csv_path, epoch, results):
+    # Convert epoch to integer to ensure consistent type for sorting
+    try:
+        epoch_int = int(epoch)
+    except ValueError:
+        print(f"Warning: Epoch '{epoch}' is not a valid integer. Using as string.")
+        epoch_int = epoch
    
     results['mean_iou']    = round(results['mean_iou']   , 3) 
     results['percentage_above_50_iou']    = round(results['percentage_above_50_iou']   , 3) 
@@ -157,7 +163,7 @@ def save_to_csv(metrics_csv_path, epoch, results):
 
 
     metrics_data = pd.DataFrame({
-        'epoch': [epoch],
+        'epoch': [epoch_int],
         'accuracy': [None],
         'fid': [None],
         'lpips_dist_avg': [None],
@@ -173,15 +179,24 @@ def save_to_csv(metrics_csv_path, epoch, results):
     if os.path.exists(metrics_csv_path):
         # Read the existing metrics CSV file
         df_metrics_existing = pd.read_csv(metrics_csv_path)
+        
+        # Ensure the epoch column is of consistent type
+        try:
+            df_metrics_existing['epoch'] = df_metrics_existing['epoch'].astype(int)
+        except ValueError:
+            # If conversion fails, convert everything to string
+            df_metrics_existing['epoch'] = df_metrics_existing['epoch'].astype(str)
+            metrics_data['epoch'] = metrics_data['epoch'].astype(str)
 
         # Check if the current epoch already exists
-        if epoch in df_metrics_existing['epoch'].values:
-            # Update the accuracy for the existing row
-            df_metrics_existing.loc[df_metrics_existing['epoch'] == epoch, 'mean_iou'] = results['mean_iou']
-            df_metrics_existing.loc[df_metrics_existing['epoch'] == epoch, 'percentage_above_50_iou'] = results['percentage_above_50_iou']
-            df_metrics_existing.loc[df_metrics_existing['epoch'] == epoch, 'mean_center_distance'] = results['mean_center_distance']
-            df_metrics_existing.loc[df_metrics_existing['epoch'] == epoch, 'center_distance_under_50px'] = results['center_distance_under_50px']
-            df_metrics_existing.loc[df_metrics_existing['epoch'] == epoch, 'scale_ratio_over_80'] = results['scale_ratio_over_80']
+        epoch_exists = (df_metrics_existing['epoch'] == epoch_int).any()
+        if epoch_exists:
+            # Update the metrics for the existing row
+            df_metrics_existing.loc[df_metrics_existing['epoch'] == epoch_int, 'mean_iou'] = results['mean_iou']
+            df_metrics_existing.loc[df_metrics_existing['epoch'] == epoch_int, 'percentage_above_50_iou'] = results['percentage_above_50_iou']
+            df_metrics_existing.loc[df_metrics_existing['epoch'] == epoch_int, 'mean_center_distance'] = results['mean_center_distance']
+            df_metrics_existing.loc[df_metrics_existing['epoch'] == epoch_int, 'center_distance_under_50px'] = results['center_distance_under_50px']
+            df_metrics_existing.loc[df_metrics_existing['epoch'] == epoch_int, 'scale_ratio_over_80'] = results['scale_ratio_over_80']
         else:
             # Append the new entry
             df_metrics_existing = pd.concat([df_metrics_existing, metrics_data], ignore_index=True)
@@ -189,7 +204,7 @@ def save_to_csv(metrics_csv_path, epoch, results):
         # If file doesn't exist, create a new DataFrame with the current metrics
         df_metrics_existing = metrics_data
 
-
+    # Sort values with appropriate data type handling
     df_metrics_existing = df_metrics_existing.sort_values(by='epoch').reset_index(drop=True)
     df_metrics_existing.to_csv(metrics_csv_path, index=False)
 
