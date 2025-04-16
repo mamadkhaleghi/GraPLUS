@@ -4,6 +4,8 @@
 [![Python 3.8](https://img.shields.io/badge/python-3.8-blue.svg)](https://www.python.org/downloads/release/python-380/)
 [![PyTorch 2.4.1](https://img.shields.io/badge/pytorch-2.4.1-orange.svg)](https://pytorch.org/get-started/previous-versions/)
 [![CUDA 12.4](https://img.shields.io/badge/cuda-12.4-green.svg)](https://developer.nvidia.com/cuda-toolkit)
+[![torchvision 0.19.1](https://img.shields.io/badge/torchvision-0.19.1-orange.svg)](https://pytorch.org)
+[![OpenCV 4.11](https://img.shields.io/badge/opencv-4.11-5C3EE8.svg)](https://opencv.org)
 
 **Mir Mohammad Khaleghi, Mehran Safayani, Abdolreza Mirzaei**  
 Department of Electrical and Computer Engineering, Isfahan University of Technology, Isfahan, Iran
@@ -96,35 +98,30 @@ We provide models for **TERSE** (CVPR 2019) [[arXiv]](https://arxiv.org/abs/1904
 See the [GracoNet repository](https://github.com/bcmi/GracoNet-Object-Placement) and [CSANet repository](https://github.com/CodeGoat24/CSANet) for the original model implementations and checkpoints.
 
 ## 🔧 Environment Setup
-
 ### Prerequisites
-- Python 3.6
-- CUDA >= 10.2
-- PyTorch 1.9.1
+- Conda package manager
+- CUDA capability (for GPU acceleration)
 
 ### Installation
-
-1. Create and activate a conda environment:
+1. Clone the repository (specifying the target directory name):
 ```bash
-conda create -n graplus python=3.6
+git clone https://github.com/mamadkhaleghi/GraPLUS.git GraPLUS
+cd GraPLUS
+```
+2. Create and activate a conda environment using the provided `environment.yaml` file:
+```bash
+conda env create -f environment.yaml
 conda activate graplus
 ```
 
-2. Install PyTorch and related packages:
-```bash
-conda install pytorch==1.9.1 torchvision==0.10.1 torchaudio==0.9.1 cudatoolkit=10.2 -c pytorch
-```
+## 💻 Hardware Requirements
 
-3. Install other dependencies:
-```bash
-pip install -r requirements.txt
-```
+Our model was developed and tested on the following hardware configuration:
 
-4. Clone the repository:
-```bash
-git clone https://github.com/mamadkhaleghi/GraPLUS.git
-cd GraPLUS-main
-```
+### Training Setup
+- **GPU**: NVIDIA GeForce GTX 1080 Ti (11GB VRAM)
+- **CPU**: Intel(R) Core(TM) i7-8700K CPU @ 3.70GHz (12 cores)
+- **RAM**: 31GB
 
 ## 🌓 Data Preparation
 GraPLUS requires two datasets:
