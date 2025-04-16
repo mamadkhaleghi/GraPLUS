@@ -115,7 +115,21 @@ cd GraPLUS
 conda env create -f environment.yaml
 conda activate graplus
 ```
-
+3. To evaluate the `accuracy` metric, you will need to do the following first:
+   
+    **Binary Classifier**: We use the SimOPA binary classifier from the [OPA repository](https://github.com/bcmi/Object-Placement-Assessment-Dataset-OPA) to measure placement plausibility
+   - Download the pre-trained classifier from [BCMI Cloud](https://cloud.bcmi.sjtu.edu.cn/sharing/XPEgkSHdQ) or [Baidu Disk](https://pan.baidu.com/s/1skFRfLyczzXUpp-6tMHArA) (code: 0qty)
+   - Place the file as `BINARY_CLASSIFIER/best-acc.pth` in your project directory
+   
+    **Faster R-CNN Model**: Required by the SimOPA classifier and originally provided by [Faster-RCNN-VG](https://github.com/shilrley6/Faster-R-CNN-with-model-pretrained-on-Visual-Genome)
+   - Download from [Google Drive](https://drive.google.com/file/d/18n_3V1rywgeADZ3oONO0DsuuS9eMW6sN/view)
+   - Place the file as `faster-rcnn/models/faster_rcnn_res101_vg.pth`
+   - Build faster-rcnn (require GCC 5 or later):
+     ```bash
+      cd faster-rcnn/lib
+      python setup.py build develop
+      cd ../..
+     ```
 ## 💻 Hardware Requirements
 
 Our model was developed and tested on the following hardware configuration:
@@ -216,25 +230,6 @@ model names correspond to subdirectories in the `models` directory, such as `gra
 
 
 ## 📊 Evaluation
-### Required Pre-trained Models
-
-To evaluate the `accuracy` metric, you will need to do the following first:
-1. **Binary Classifier**: We use the SimOPA binary classifier from the [OPA repository](https://github.com/bcmi/Object-Placement-Assessment-Dataset-OPA) to measure placement plausibility
-   - Download the pre-trained classifier from [BCMI Cloud](https://cloud.bcmi.sjtu.edu.cn/sharing/XPEgkSHdQ) or [Baidu Disk](https://pan.baidu.com/s/1skFRfLyczzXUpp-6tMHArA) (code: 0qty)
-   - Place the file as `BINARY_CLASSIFIER/best-acc.pth` in your project directory
-   
-2. **Faster R-CNN Model**: Required by the SimOPA classifier and originally provided by [Faster-RCNN-VG](https://github.com/shilrley6/Faster-R-CNN-with-model-pretrained-on-Visual-Genome)
-   - Download from [Google Drive](https://drive.google.com/file/d/18n_3V1rywgeADZ3oONO0DsuuS9eMW6sN/view)
-   - Place the file as `faster-rcnn/models/faster_rcnn_res101_vg.pth`
-   - Build faster-rcnn (require GCC 5 or later):
-     ```bash
-      cd faster-rcnn/lib
-      python setup.py build develop
-      cd ../..
-     ```
-
-### Running Evaluations
-
 Use the `evaluate.sh` script in the main directory to run evaluations on your trained models:
 
 #### Usage
