@@ -47,7 +47,7 @@ GraPLUS achieves placement accuracy of **92.1%** and an FID score of 28.83 on th
 - **Multi-Objective Training**: Our approach incorporates semantic consistency constraints alongside adversarial learning.
 
 ## 📊 Model Architecture
-![GraPLUS](images/framework.png)
+![GraPLUS](.images/framework.png)
 GraPLUS consists of four principal components:
 
 1. **Scene Graph Processing**: Transforms background images into structured graph representations using a pre-trained Neural-MOTIFS model.
@@ -80,7 +80,7 @@ For more details, see [gpt2_embeddings/README.md](gpt2_embeddings/README.md).
 
 Below are some visual comparisons between our method and previous GAN-based approaches:
 
-![Visual Comparisons](images/visual_comparison.png)
+![Visual Comparisons](.images/visual_comparison.png)
 
 Each column represents a different method, and each row represents a different test case. The red outline indicates the predicted placement boundaries.
 
