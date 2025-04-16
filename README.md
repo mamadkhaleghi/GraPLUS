@@ -1,8 +1,9 @@
 # GraPLUS: Graph-based Placement Using Semantics for Image Composition
 
 [![arXiv](https://img.shields.io/badge/arXiv-2503.15761-b31b1b.svg)](https://arxiv.org/abs/2503.15761)
-[![Python 3.6](https://img.shields.io/badge/python-3.6-blue.svg)](https://www.python.org/downloads/release/python-360/)
-[![PyTorch 1.9.1](https://img.shields.io/badge/pytorch-1.9.1-orange.svg)](https://pytorch.org/get-started/previous-versions/)
+[![Python 3.8](https://img.shields.io/badge/python-3.8-blue.svg)](https://www.python.org/downloads/release/python-380/)
+[![PyTorch 2.4.1](https://img.shields.io/badge/pytorch-2.4.1-orange.svg)](https://pytorch.org/get-started/previous-versions/)
+[![CUDA 12.4](https://img.shields.io/badge/cuda-12.4-green.svg)](https://developer.nvidia.com/cuda-toolkit)
 
 **Mir Mohammad Khaleghi, Mehran Safayani, Abdolreza Mirzaei**  
 Department of Electrical and Computer Engineering, Isfahan University of Technology, Isfahan, Iran
