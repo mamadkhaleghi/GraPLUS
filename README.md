@@ -17,6 +17,7 @@ Department of Electrical and Computer Engineering, Isfahan University of Technol
 - [Visual Comparisons](#-visual-comparisons)
 - [Pre-trained Models](#-pre-trained-models)
 - [Environment Setup](#-environment-setup)
+- [Hardware Requirements](#-hardware-requirements)
 - [Data Preparation](#-data-preparation)
 - [Training](#-training)
 - [Inference](#-inference)
@@ -26,6 +27,7 @@ Department of Electrical and Computer Engineering, Isfahan University of Technol
 - [Acknowledgements](#-acknowledgements)
 - [Contact](#-contact)
 
+  
 ## Abstract
 
 We present GraPLUS, a novel framework for plausible object placement in images that leverages scene graphs and large language models. Our approach uniquely combines graph-structured scene representation with semantic understanding to determine contextually appropriate object positions. The framework employs GPT-2 to transform categorical node and edge labels into rich semantic embeddings that capture both definitional characteristics and typical spatial contexts, enabling nuanced understanding of object relationships and placement patterns.
