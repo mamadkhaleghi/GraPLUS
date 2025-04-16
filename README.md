@@ -219,8 +219,7 @@ model names correspond to subdirectories in the `models` directory, such as `gra
 ## 📊 Evaluation
 ### Required Pre-trained Models
 
-Before evaluation on `accuracy` metric, you'll need these pre-trained models:
-
+To evaluate the `accuracy` metric, you will need to do the following first:
 1. **Binary Classifier**: We use the SimOPA binary classifier from the [OPA repository](https://github.com/bcmi/Object-Placement-Assessment-Dataset-OPA) to measure placement plausibility
    - Download the pre-trained classifier from [BCMI Cloud](https://cloud.bcmi.sjtu.edu.cn/sharing/XPEgkSHdQ) or [Baidu Disk](https://pan.baidu.com/s/1skFRfLyczzXUpp-6tMHArA) (code: 0qty)
    - Place the file as `BINARY_CLASSIFIER/best-acc.pth` in your project directory
@@ -228,7 +227,12 @@ Before evaluation on `accuracy` metric, you'll need these pre-trained models:
 2. **Faster R-CNN Model**: Required by the SimOPA classifier and originally provided by [Faster-RCNN-VG](https://github.com/shilrley6/Faster-R-CNN-with-model-pretrained-on-Visual-Genome)
    - Download from [Google Drive](https://drive.google.com/file/d/18n_3V1rywgeADZ3oONO0DsuuS9eMW6sN/view)
    - Place the file as `faster-rcnn/models/faster_rcnn_res101_vg.pth`
-
+   - Build faster-rcnn (require GCC 5 or later):
+     ```bash
+      cd faster-rcnn/lib
+      python setup.py build develop
+      cd ../..
+     ```
 
 ### Running Evaluations
 
@@ -254,7 +258,7 @@ This script will automatically evaluate:
 - **LPIPS**: Quantifies generation diversity
 - **Spatial Precision**: Computes Spatial Precision metrics
 
-Results will be available at `result/experiment_name/eval_metrics_experiment_name.csv`.
+Results will be saved to `result/experiment_name/eval_metrics_experiment_name.csv`.
 
 ## 📈 Results
 
