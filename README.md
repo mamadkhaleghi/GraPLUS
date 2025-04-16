@@ -219,7 +219,7 @@ model names correspond to subdirectories in the `models` directory, such as `gra
 ## 📊 Evaluation
 ### Required Pre-trained Models
 
-Before evaluation, you'll need these pre-trained models:
+Before evaluation on `accuracy` metric, you'll need these pre-trained models:
 
 1. **Binary Classifier**: We use the SimOPA binary classifier from the [OPA repository](https://github.com/bcmi/Object-Placement-Assessment-Dataset-OPA) to measure placement plausibility
    - Download the pre-trained classifier from [BCMI Cloud](https://cloud.bcmi.sjtu.edu.cn/sharing/XPEgkSHdQ) or [Baidu Disk](https://pan.baidu.com/s/1skFRfLyczzXUpp-6tMHArA) (code: 0qty)
