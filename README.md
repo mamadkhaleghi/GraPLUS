@@ -243,6 +243,7 @@ Use the `evaluate.sh` script in the main directory to run evaluations on your tr
 ./evaluate.sh graplus 21 fid        # Evaluate FID
 ./evaluate.sh graplus 21 lpips      # Evaluate LPIPS
 ./evaluate.sh graplus 21 sp         # Evaluate Spatial Precision
+./evaluate.sh graplus 21 sp_new     # Evaluate Spatial Precision (New Approach)
 ./evaluate.sh graplus 21 all        # Run all evaluations
 ```
 
