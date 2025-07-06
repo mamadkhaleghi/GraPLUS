@@ -7,7 +7,7 @@ import math
 import numpy as np
 
 
-############################################################################################################### node/edge embedding
+############################################################################################################### node/edge/fg_category embedding
 class GraphEmbeddings(nn.Module):
     def __init__(self, opt):
         super(GraphEmbeddings, self).__init__()
@@ -95,7 +95,7 @@ class GraphEmbeddings(nn.Module):
             self.edge_embedding_matrix = self.edge_embedding_matrix.to(self.device)
 
 
-############################################################################################################### GTN (Graph Transformer Network)
+###############################################################################################################
 class GTN_layer(nn.Module):
     def __init__(self, opt, input_dim, output_dim, dropout=0.1):
         super(GTN_layer, self).__init__()
@@ -168,11 +168,18 @@ class GTN_layer(nn.Module):
 
         # Assign computed attention scores to attn_scores tensor
         attn_scores[src_nodes, tgt_nodes] = attn_edge
+        # print("\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
+        # print("attn_scores.shape: ", attn_scores.shape)
+        # print("attn_scores[0]: ", attn_scores[0])
 
         # Self-loops
         attn_self = (Q * K).sum(dim=2) / (self.head_dim ** 0.5)
         
+        # print("\nattn_self.shape: ", attn_self.shape)
+        # print("attn_self[0]: ", attn_self[0])
         attn_scores[torch.arange(num_nodes), torch.arange(num_nodes)] = attn_self 
+        # print("\nattn_scores.shape: ", attn_scores.shape)
+        # print("attn_scores[0]: ", attn_scores[0])
 
         # Apply softmax to compute attention weights
         attn_weights = F.softmax(attn_scores, dim=1)  # (num_nodes, num_nodes, num_heads)
@@ -239,65 +246,9 @@ class GTN(nn.Module):
 
 
 
-    def __init__(self, opt, dropout=0.1):
-        super(GTN, self).__init__()
 
-        self.layers = nn.ModuleList()
-        num_layers = opt.gtn_num_layer
 
-        if num_layers >= 1:
-            output_dim = opt.gtn_hidden_dim if num_layers > 1 else opt.gtn_output_dim
-            self.layers.append(GTN_layer(opt, opt.embed_dim, output_dim, dropout))
 
-            for _ in range(num_layers - 2):
-                self.layers.append(GTN_layer(opt, opt.gtn_hidden_dim, opt.gtn_hidden_dim, dropout))
 
-            if num_layers > 1:
-                self.layers.append(GTN_layer(opt, opt.gtn_hidden_dim, opt.gtn_output_dim, dropout))
 
-        # Initialize weights
-        self.init_weights()
 
-    def init_weights(self):
-        """Initialize weights with scene graph-specific considerations"""
-        for layer in self.layers:
-            # Query and Key projections: Use Kaiming initialization
-            # This helps with the attention mechanism's gradient flow
-            for module in [layer.query_proj, layer.key_proj]:
-                nn.init.kaiming_normal_(module.weight, mode='fan_out', nonlinearity='relu')
-                if module.bias is not None:
-                    bound = 1 / math.sqrt(module.bias.shape[0])
-                    nn.init.uniform_(module.bias, -bound, bound)
-
-            # Value projection: Using xavier_normal_ for better value propagation
-            nn.init.xavier_normal_(layer.value_proj.weight)
-            if layer.value_proj.bias is not None:
-                nn.init.zeros_(layer.value_proj.bias)
-
-            # Edge projections: Important for relationship features
-            # Using xavier_uniform_ with a smaller gain for more stable initial predictions
-            nn.init.xavier_uniform_(layer.edge_proj.weight, gain=0.5)
-            if layer.edge_proj.bias is not None:
-                nn.init.zeros_(layer.edge_proj.bias)
-
-            # Output and input projections
-            for module in [layer.out_proj, layer.input_proj]:
-                # Using xavier_uniform_ with custom gain for better stability
-                nn.init.xavier_uniform_(module.weight, gain=0.8)
-                if module.bias is not None:
-                    nn.init.zeros_(module.bias)
-            
-            # Layer norm: Initialize with slightly positive bias 
-            # This helps prevent dead neurons in deep networks
-            if hasattr(layer, 'layer_norm'):
-                nn.init.ones_(layer.layer_norm.weight)
-                nn.init.constant_(layer.layer_norm.bias, 0.1)
-
-    def reset_parameters(self):
-        """Reset all parameters by re-initializing them"""
-        self.init_weights()
-
-    def forward(self, x, edge_index, edge_attr):
-        for layer in self.layers:
-            x, edge_attr = layer(x, edge_index, edge_attr)
-        return x, edge_attr
