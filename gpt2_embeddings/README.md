@@ -77,8 +77,24 @@ The embedding mode can be configured using the `--gpt2_node_mode` parameter duri
 
 If you use these embeddings in your research, please cite our paper:
 
-```
+```bibtex
 @article{khaleghi2025graplus,
+  title={GraPLUS: Graph-based Placement Using Semantics for image composition},
+  author={Khaleghi, Mir Mohammad and Safayani, Mehran and Mirzaei, Abdolreza},
+  journal={Computer Vision and Image Understanding},
+  volume={259},
+  pages={104427},
+  year={2025},
+  month={September},
+  publisher={Elsevier},
+  doi={10.1016/j.cviu.2025.104427},
+  url={https://www.sciencedirect.com/science/article/abs/pii/S107731422500150X}
+}
+```
+
+**arXiv preprint version:**
+```bibtex
+@article{khaleghi2025graplus_arxiv,
   title={GraPLUS: Graph-based Placement Using Semantics for Image Composition},
   author={Khaleghi, Mir Mohammad and Safayani, Mehran and Mirzaei, Abdolreza},
   journal={arXiv preprint arXiv:2503.15761},
