@@ -253,7 +253,7 @@ This script will automatically evaluate:
 - **LPIPS**: Quantifies generation diversity
 - **Spatial Precision**: Computes Spatial Precision metrics
 
-Results will be saved to `result/experiment_name/eval_metric_name.csv`.
+Results will be saved to `result/experiment_name/eval_metrics_experiment_name.csv`.
 
 ## 📈 Results
 
