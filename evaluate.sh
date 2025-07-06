@@ -7,6 +7,7 @@ if [ "$#" -ne 3 ]; then
     echo "Example: $0 graplus 21 fid"
     echo "Example: $0 graplus 21 lpips"
     echo "Example: $0 graplus 21 sp"
+    echo "Example: $0 graplus 21 sp_new"
     echo "Example: $0 graplus 21 all"
     exit 1
 fi
@@ -43,6 +44,13 @@ elif [ "$METRIC" = "sp" ]; then
     echo "Running Spatial Precision evaluation..."
     sh script/eval_spatial_precision.sh "$MODEL_NAME" "$EPOCH"
 
+elif [ "$METRIC" = "sp_new" ]; then
+    # Run Spatial Precision evaluation
+    echo "Running Spatial Precision (new approach) evaluation..."
+    sh script/eval_spatial_precision_new.sh "$MODEL_NAME" "$EPOCH"
+
+
+
 elif [ "$METRIC" = "all" ]; then
     # Run all evaluations
     echo "Running all evaluations..."
@@ -54,8 +62,10 @@ elif [ "$METRIC" = "all" ]; then
     sh script/eval_lpips.sh "$MODEL_NAME" "$EPOCH"
     echo "Running Spatial Precision evaluation..."
     sh script/eval_spatial_precision.sh "$MODEL_NAME" "$EPOCH"
+    echo "Running Spatial Precision (new approach) evaluation..."
+    sh script/eval_spatial_precision_new.sh "$MODEL_NAME" "$EPOCH"
 
 else
-    echo "Error: Invalid metric specified. Must be 'accuracy', 'fid', 'lpips', 'sp', or 'all'"
+    echo "Error: Invalid metric specified. Must be 'accuracy', 'fid', 'lpips', 'sp', 'sp_new', or 'all'"
     exit 1
 fi
