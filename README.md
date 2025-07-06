@@ -1,5 +1,5 @@
 # GraPLUS: Graph-based Placement Using Semantics for Image Composition
-
+[![CVIU 2025](https://img.shields.io/badge/CVIU-2025-red.svg)](https://www.sciencedirect.com/science/article/abs/pii/S107731422500150X)
 [![arXiv](https://img.shields.io/badge/arXiv-2503.15761-b31b1b.svg)](https://arxiv.org/abs/2503.15761)
 [![Python 3.8](https://img.shields.io/badge/python-3.8-blue.svg)](https://www.python.org/downloads/release/python-380/)
 [![PyTorch 2.4.1](https://img.shields.io/badge/pytorch-2.4.1-orange.svg)](https://pytorch.org/get-started/previous-versions/)
@@ -32,7 +32,7 @@ Department of Electrical and Computer Engineering, Isfahan University of Technol
 
 We present GraPLUS, a novel framework for plausible object placement in images that leverages scene graphs and large language models. Our approach uniquely combines graph-structured scene representation with semantic understanding to determine contextually appropriate object positions. The framework employs GPT-2 to transform categorical node and edge labels into rich semantic embeddings that capture both definitional characteristics and typical spatial contexts, enabling nuanced understanding of object relationships and placement patterns.
 
-GraPLUS achieves placement accuracy of **92.1%** and an FID score of 28.83 on the OPA dataset, outperforming state-of-the-art methods by 8.1% while maintaining competitive visual quality. In human evaluation studies involving 964 samples assessed by 19 participants, our method was preferred in **52.1%** of cases, significantly outperforming previous approaches.
+GraPLUS achieves placement accuracy of **92.1%** and an FID score of 28.83 on the OPA dataset, outperforming state-of-the-art methods by 8.1% while maintaining competitive visual quality. In human evaluation studies involving 964 samples assessed by 38 participants, our method was preferred in **51.8%** of cases, significantly outperforming previous approaches.
 
 ## ✨ Key Innovations
 
@@ -92,10 +92,10 @@ We provide models for **TERSE** (CVPR 2019) [[arXiv]](https://arxiv.org/abs/1904
 |-----|----------|------------|----------|--------|--------|---------------------|
 | 0   | TERSE    | -          |   0.683  | 47.44  | 0.000  | [Google_Drive](https://drive.google.com/file/d/1L2R4J7nMoNhtg5a0dnGSVpLmxJCVXM3s/view?usp=sharing) |
 | 1   | PlaceNet | -          |   0.684  | 37.63  | 0.160  | [Google_Drive](https://drive.google.com/file/d/1TDyLUt4Xc2anGVQZZYlvTmlayKCq4Mzx/view?usp=sharing) |
-| 2   | GracoNet | 0.263 | 0.838 | 29.35 | 0.207 | [Google_Drive](https://drive.google.com/file/d/1LQEb3nX5oTd8RR1uEcA99SKC6u6fyiGS/view?usp=sharing) |
+| 2   | GracoNet | 0.258 | 0.838 | 29.35 | 0.207 | [Google_Drive](https://drive.google.com/file/d/1LQEb3nX5oTd8RR1uEcA99SKC6u6fyiGS/view?usp=sharing) |
 | 3   | CA-GAN   | -          |   0.734  | 25.54  | **0.267**  | [Google_Drive](https://drive.google.com/file/d/1fF9EG5TXX_mMMhF3Nz5qBTwbqQ8M-4wI/view?usp=sharing) |
-| 4   | CSANet   | 0.216 | 0.803 | **22.42** | 0.264 | [Google_Drive](https://drive.google.com/file/d/1me7Ua67Pnwl9entWXgFRTP_ZyvAfWhJu/view?usp=sharing) |
-| 5   | GraPLUS  | **0.521**  | **0.921**| 28.83  | 0.055  | [Google_Drive](https://drive.google.com/file/d/1TDyLUt4Xc2anGVQZZYlvTmlayKCq4Mzx/view?usp=sharing) |
+| 4   | CSANet   | 0.224 | 0.803 | **22.42** | 0.264 | [Google_Drive](https://drive.google.com/file/d/1me7Ua67Pnwl9entWXgFRTP_ZyvAfWhJu/view?usp=sharing) |
+| 5   | GraPLUS  | **0.518**  | **0.921**| 28.83  | 0.055  | [Google_Drive](https://drive.google.com/file/d/1TDyLUt4Xc2anGVQZZYlvTmlayKCq4Mzx/view?usp=sharing) |
 
 See the [GracoNet repository](https://github.com/bcmi/GracoNet-Object-Placement) and [CSANet repository](https://github.com/CodeGoat24/CSANet) for the original model implementations and checkpoints.
 
@@ -264,10 +264,10 @@ Our model outperforms previous GAN-based methods across multiple metrics:
 |----------|------------|----------|----------|--------------|-------------|
 | TERSE    | -          | 0.683    | 0.171    | 172.04       | 9.1%        |
 | PlaceNet | -          | 0.684    | 0.194    | 144.77       | 12.0%       |
-| GracoNet | 0.263      | 0.838    | 0.192    | 166.95       | 14.7%       |
+| GracoNet | 0.258      | 0.838    | 0.192    | 166.95       | 14.7%       |
 | CA-GAN   | -          | 0.734    | 0.165    | 190.37       | 12.5%       |
-| CSANet   | 0.216      | 0.803    | 0.162    | 193.34       | 13.6%       |
-| GraPLUS  | **0.521**  | **0.921**| **0.203**| **141.77**   | **16.5%**   |
+| CSANet   | 0.224      | 0.803    | 0.162    | 193.34       | 13.6%       |
+| GraPLUS  | **0.518**  | **0.921**| **0.203**| **141.77**   | **16.5%**   |
 
 ### Ablation Studies
 Our experiments validate key design choices:
@@ -286,6 +286,22 @@ If you find **GraPLUS** useful, please cite our paper:
 
 ```bibtex
 @article{khaleghi2025graplus,
+  title={GraPLUS: Graph-based Placement Using Semantics for image composition},
+  author={Khaleghi, Mir Mohammad and Safayani, Mehran and Mirzaei, Abdolreza},
+  journal={Computer Vision and Image Understanding},
+  volume={259},
+  pages={104427},
+  year={2025},
+  month={September},
+  publisher={Elsevier},
+  doi={10.1016/j.cviu.2025.104427},
+  url={https://www.sciencedirect.com/science/article/abs/pii/S107731422500150X}
+}
+```
+
+**arXiv preprint version:**
+```bibtex
+@article{khaleghi2025graplus_arxiv,
   title={GraPLUS: Graph-based Placement Using Semantics for Image Composition},
   author={Khaleghi, Mir Mohammad and Safayani, Mehran and Mirzaei, Abdolreza},
   journal={arXiv preprint arXiv:2503.15761},
