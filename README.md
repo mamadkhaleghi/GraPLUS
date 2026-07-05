@@ -95,7 +95,7 @@ We provide models for **TERSE** (CVPR 2019) [[arXiv]](https://arxiv.org/abs/1904
 | 2   | GracoNet | 0.258 | 0.838 | 29.35 | 0.207 | [Google_Drive](https://drive.google.com/file/d/1LQEb3nX5oTd8RR1uEcA99SKC6u6fyiGS/view?usp=sharing) |
 | 3   | CA-GAN   | -          |   0.734  | 25.54  | **0.267**  | [Google_Drive](https://drive.google.com/file/d/1fF9EG5TXX_mMMhF3Nz5qBTwbqQ8M-4wI/view?usp=sharing) |
 | 4   | CSANet   | 0.224 | 0.803 | **22.42** | 0.264 | [Google_Drive](https://drive.google.com/file/d/1me7Ua67Pnwl9entWXgFRTP_ZyvAfWhJu/view?usp=sharing) |
-| 5   | GraPLUS  | **0.518**  | **0.921**| 28.83  | 0.055  | [Google_Drive](https://drive.google.com/file/d/1TDyLUt4Xc2anGVQZZYlvTmlayKCq4Mzx/view?usp=sharing) |
+| 5   | GraPLUS  | **0.518**  | **0.921**| 28.83  | 0.055  | [Google_Drive](https://drive.google.com/file/d/1owwkDvR6Tl9MKoIl50UI83wxc35dZ4ub/view?usp=sharing) |
 
 See the [GracoNet repository](https://github.com/bcmi/GracoNet-Object-Placement) and [CSANet repository](https://github.com/CodeGoat24/CSANet) for the original model implementations and checkpoints.
 
