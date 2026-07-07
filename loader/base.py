@@ -75,7 +75,7 @@ class SG_OPABasicDataset(Dataset):
         
         self.num_node = num_nodes                                            
 
-        self.sg_bg_dir = os.path.join(sg_root, f"sg_opa_background_n{num_nodes}")
+        self.sg_bg_dir = os.path.join(sg_root, f"sg_background_n{num_nodes}")
 
         if mode_type == "train":
             csv_file = os.path.join(data_root, "train_data.csv")           
